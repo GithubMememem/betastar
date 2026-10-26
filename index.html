@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Betastar Reloaded</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@500&display=swap">
+<style>
+:root{color-scheme:dark;--ic:#c9d1d6;--act:#9cc7de}*{box-sizing:border-box}html{font-size:clamp(13px,1.45vw,26px)}
+html,body{margin:0;min-height:100%;background:#000;color:#fff;font-family:'Jua',system-ui,sans-serif}
+#stars{position:fixed;inset:0;z-index:0;width:100%;height:100%}#app{position:relative;z-index:1;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:.2rem .5rem;height:2.4rem}
+.logo,.hl{cursor:pointer;text-shadow:0 0 10px #fff;transition:.2s;user-select:none}.logo{font-size:1.9rem}.hl{font-size:1.6rem}.logo:hover,.hl:hover{transform:scale(.9);color:lightblue;text-shadow:0 0 12px lightblue}
+nav{display:flex;gap:1.05rem;align-items:center}
+nav svg{width:1.25rem;height:1.25rem;fill:var(--ic);cursor:pointer;transition:.2s;filter:drop-shadow(0 0 4px rgba(255,255,255,.3))}
+nav svg:hover{transform:scale(.8)}nav svg.on{fill:var(--act);filter:drop-shadow(0 0 7px var(--act))}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:78vh;gap:.9rem;text-align:center;padding:0 1rem}
+.big{font-size:6.2rem;line-height:1;text-shadow:0 0 18px #fff}.title{font-size:4.2rem;text-shadow:0 0 15px #fff;line-height:1;margin-bottom:.6rem}
+.hd{display:flex;flex-direction:column;align-items:center}
+.rl{display:block;width:min(22rem,72vw);margin-top:-.8rem;transform:rotate(-2.5deg);pointer-events:none;user-select:none}
+.tag{font-size:1.2rem;max-width:40rem;line-height:1.5;margin-top:.4rem}
+.yee{color:#ffe500;font-family:'Google Sans','Google Sans Flex','Product Sans',Outfit,system-ui,sans-serif;font-weight:500;position:relative;display:inline-block;cursor:pointer;transition:transform .3s ease,text-shadow .3s ease}
+.yee::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:#ffe500;transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+.yee:hover{transform:scale(1.08);text-shadow:0 0 12px rgba(255,229,0,.8)}.yee:hover::after{transform:scaleX(1)}
+.btn{font-family:inherit;font-size:1.3rem;border:0;border-radius:.6rem;padding:.25rem 1.8rem;min-width:9rem;background:#fff;color:#3a3a3a;cursor:pointer;filter:drop-shadow(0 0 5px #fff);transition:.2s}
+.btn:hover{transform:scale(.9)}.btn:disabled{opacity:.6;cursor:default}
+form{display:flex;flex-direction:column;align-items:center;gap:.8rem}
+.fld{width:17rem;height:2.1rem;border:0;border-radius:.6rem;background:#fff;color:#3a3a3a;caret-color:#3a3a3a;font-family:inherit;font-size:1.1rem;text-align:center;filter:drop-shadow(0 0 5px #fff);outline:0}
+.note{font-size:.75rem;opacity:.55;max-width:28rem}
+.home{position:relative;padding-top:1.4rem}
+.side{position:absolute;left:.3rem;top:2.2rem;display:flex;flex-direction:column;gap:.75rem;width:min(12rem,32vw)}
+.side button{font-family:inherit;font-size:1.3rem;border:0;border-radius:.35rem;height:2.5rem;cursor:pointer;transition:.2s;filter:drop-shadow(0 0 5px var(--g))}.side button:hover{transform:scale(.92)}
+.prof{text-align:center;margin:0 auto;width:fit-content;max-width:90vw}
+.av{width:10rem;aspect-ratio:1;margin:0 auto;border:3px solid #fff;border-radius:.3rem;background:#0c0c0c center/cover;box-shadow:0 0 16px var(--c,#4cff4c)}
+.prof h1{font-weight:400;font-size:2.7rem;margin:.5rem 0 0;line-height:1.1;text-shadow:0 0 15px var(--c,#4cff4c)}.prof p{margin:.1rem;font-size:1.1rem;text-shadow:0 0 6px #000}
+.bio{font-size:.95rem!important;opacity:.85;max-width:17rem;margin:.3rem auto!important;overflow-wrap:anywhere}
+.pill{display:block;margin:.35rem auto;width:12rem;height:1.4rem;border-radius:.7rem;border:0;background:#f1f1f1;color:#444;font-family:inherit;font-size:.7rem;text-align:center;cursor:pointer;outline:0;transition:.2s}
+input.pill{cursor:text}.pill:not(input):hover{background:#cde;transform:scale(.94)}
+.bd{display:none;background:#e00;color:#fff;border-radius:50%;min-width:1.1rem;height:1.1rem;font-size:.7rem;line-height:1.1rem;margin-left:.2rem;vertical-align:middle}
+.crates{display:flex;flex-wrap:wrap;gap:1.4rem 1.5rem;padding:.6rem .8rem}
+.crate{width:min(11rem,42vw);aspect-ratio:1.02;border-radius:.8rem;padding:.55rem .3rem .4rem;text-align:center;cursor:pointer;background:color-mix(in srgb,var(--c) 36%,#060606);box-shadow:0 0 14px color-mix(in srgb,var(--c) 70%,transparent);transition:.25s ease;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.crate.sol{background:var(--c)}.crate.sol .nm{text-shadow:0 0 6px #000,0 0 3px #000}.crate:hover{transform:scale(1.06);box-shadow:0 0 26px var(--c)}
+.crate .nm{font-size:1.05rem;text-shadow:0 0 6px rgba(255,255,255,.5)}.crate .pr{font-size:1.1rem;display:flex;align-items:center;gap:.25rem}
+.ct{width:5.3rem;aspect-ratio:1;border:2px solid #fff;border-radius:.2rem;box-shadow:0 0 8px rgba(0,0,0,.5)}
+.atom{width:1.1rem;height:1.1rem;fill:none;stroke:#fff;stroke-width:22}
+.bal{position:fixed;right:.7rem;bottom:.5rem;font-size:1rem;display:flex;align-items:center;gap:.25rem;z-index:5;text-shadow:0 0 6px #000}
+.lb{padding:.1rem .8rem}.row{display:flex;align-items:center;background:#0f0f0f;border-radius:.4rem;height:1.75rem;padding:0 .8rem;margin:.28rem 0;font-size:1.05rem}
+.row .n{flex:1;text-align:left}.row .r{flex:0 0 5rem;text-align:center;font-size:.7rem}.row .a{flex:1;text-align:right}
+.tabs{display:flex;justify-content:center;gap:1.4rem;margin:.4rem 0;font-size:1.1rem}.tabs span{cursor:pointer;opacity:.45;padding:.1rem .3rem;border-bottom:2px solid transparent;transition:.25s}.tabs span.on{opacity:1;border-color:#9cc7de;text-shadow:0 0 10px #9cc7de}
+.pan{display:flex;justify-content:center;align-items:stretch;gap:1.2rem;margin:.5rem auto;flex-wrap:wrap}
+.box{background:#0f0f0f;border-radius:.9rem;width:9rem;height:8rem;display:flex;align-items:center;justify-content:center;font-size:1.6rem;padding:.4rem;text-align:center}
+.etile{width:8rem;aspect-ratio:1;border:3px solid #fff;border-radius:.3rem;background:#111 center/cover;box-shadow:0 0 14px rgba(255,255,255,.6);position:relative;cursor:pointer;transition:.2s}.etile:hover{transform:scale(1.04)}
+.qty{position:absolute;right:-.45rem;bottom:-.45rem;background:#666;border-radius:50%;min-width:1.15rem;height:1.15rem;font-size:.7rem;line-height:1.15rem;padding:0 .2rem}
+.grid{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin:.6rem auto;padding:.7rem;background:#0f0f0f;border-radius:.9rem;max-width:62rem;min-height:3.5rem;align-items:center}
+.gt{width:2.9rem;aspect-ratio:1;border:2px solid #fff;border-radius:.25rem;background:#111 center/cover;cursor:pointer;transition:.2s}.gt:hover{transform:scale(1.15)}.gt.s{box-shadow:0 0 10px #fff}.gt.lock{filter:brightness(.18) grayscale(1);border-color:#555}
+.menu{position:fixed;z-index:60;background:#111e;border-radius:.3rem;overflow:hidden;font-size:.85rem}.menu p{margin:0;padding:.15rem .8rem;cursor:pointer}.menu p:hover{color:#8ed0ff}
+.chat{max-width:56rem;margin:.4rem auto;padding:0 .8rem}.cbox{height:60vh;overflow:auto;background:#0f0f0f;border-radius:.9rem;padding:.5rem}
+.msg{padding:.25rem .6rem;border-radius:.45rem;font-size:1rem;line-height:1.3;word-break:break-word}.msg:hover{background:#171717}.msg b{font-weight:400;margin-right:.4rem}.msg i{font-style:normal;opacity:.4;font-size:.65rem;margin-right:.4rem}
+.cin{display:flex;gap:.5rem;margin-top:.6rem;flex-direction:row}.cin .fld{flex:1;width:auto;text-align:left;padding:0 .8rem}.cin .btn{min-width:5rem;padding:.1rem 1rem;font-size:1.1rem}
+.fr{display:flex;gap:1rem;padding:.4rem .8rem;max-width:62rem;margin:0 auto;flex-wrap:wrap}.flist{flex:0 0 17rem;width:min(100%,17rem);background:#0f0f0f;border-radius:.9rem;padding:.7rem;min-height:60vh}
+.dm{flex:1;min-width:16rem}.dh{font-size:1.3rem;margin-bottom:.4rem;text-align:left}.fh{font-size:1.4rem;margin-bottom:.3rem}.fs{font-size:.8rem;opacity:.6;margin:.7rem 0 .2rem;text-align:left}
+.fi{display:flex;align-items:center;justify-content:space-between;gap:.3rem;padding:.25rem .5rem;border-radius:.4rem;cursor:pointer;transition:.2s;text-align:left}.fi:hover,.fi.sel{background:#1c1c1c}
+.mini{font-family:inherit;font-size:.7rem;border:0;border-radius:.3rem;background:#eee;color:#444;padding:.05rem .45rem;cursor:pointer;transition:.2s}.mini:hover{background:#cde;transform:scale(.92)}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.5);display:grid;place-items:center}
+.pop{background:#fff;border:1px solid #1a1a8a;border-radius:.7rem;padding:1.1rem 1.2rem;width:min(92vw,24rem);display:flex;flex-direction:column;align-items:center;gap:.7rem;animation:zoomIn 1s ease both;color:#fff;text-shadow:0 0 5px #000,0 0 3px #000}
+.pop h2{font-weight:400;font-size:1.6rem;margin:0;line-height:1.15}.pop .t{color:#444;text-shadow:none;font-size:1.05rem;overflow-wrap:anywhere}
+.pop .b{font-family:inherit;border:0;border-radius:.45rem;background:#eee;color:#444;font-size:1rem;padding:.15rem 1rem;cursor:pointer;text-shadow:none;transition:.2s}.pop .b:hover{background:#cfd8e3;transform:scale(.92)}
+.pop .rw{display:flex;gap:.6rem}.pop.err{box-shadow:0 0 18px #a00}.pop.err h2{color:#b00020;text-shadow:none}
+.ta{width:100%;height:5rem;border:1px solid #ccc;border-radius:.4rem;padding:.4rem;font-family:inherit;font-size:1rem;color:#333;text-shadow:none;resize:none}
+@keyframes zoomIn{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+.bsp{position:fixed;left:70%;top:78%;z-index:75;font-size:2.4rem;color:#fff;text-shadow:0 0 10px #fff;animation:bsp 1.4s ease-in-out infinite}@keyframes bsp{0%{transform:rotate(0) scale(.7)}50%{transform:rotate(180deg) scale(1.15)}100%{transform:rotate(360deg) scale(.7)}}
+.reveal{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.4);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:1.2rem 0 4rem;animation:fi .6s ease both;transition:opacity .8s ease}.reveal.out{opacity:0}@keyframes fi{from{opacity:0}to{opacity:1}}
+.reveal .rn{font-size:4rem;text-shadow:0 0 16px #fff,0 0 4px #000;animation:zoomIn 1s ease both}
+.reveal .rt{position:relative;width:10rem;aspect-ratio:1;border:3px solid #fff;border-radius:.4rem;background:#000 center/cover;box-shadow:0 0 25px rgba(255,255,255,.7);animation:tileIn 1.8s ease .4s both}
+.reveal .rr{font-size:4rem;animation:zoomIn 1s ease .3s both}.nw{position:absolute;top:-.9rem;right:-1.4rem;color:#ffe500;font-size:1rem;transform:rotate(12deg);text-shadow:0 0 8px #000}
+@keyframes tileIn{0%{opacity:0;transform:scale(.3);filter:brightness(0)}35%{opacity:1;transform:scale(1);filter:brightness(0)}100%{opacity:1;transform:scale(1);filter:none}}
+#pc{position:fixed;inset:0;z-index:71;pointer-events:none}
+#toast{position:fixed;top:3rem;left:50%;transform:translateX(-50%);background:#222e;padding:.3rem 1rem;border-radius:.6rem;z-index:99;opacity:0;transition:opacity .4s ease;pointer-events:none;font-size:1rem}#toast.show{opacity:1}
+.biobox{background:#0f0f0f;border-radius:.9rem;padding:.6rem .9rem;width:min(22rem,88vw);margin:.9rem auto 0;font-size:1rem;line-height:1.35;overflow-wrap:anywhere;text-align:left}.biobox .bh{font-size:.8rem;opacity:.55;margin-bottom:.2rem}
+.land,.auth{position:relative;height:100vh;overflow:hidden}
+.blaxText{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);font-size:10vw;white-space:nowrap;text-shadow:0 0 15px #fff;animation:zoomInBlax 1s ease forwards}
+@keyframes zoomInBlax{0%{font-size:0}50%{font-size:10.5vw}100%{font-size:10vw}}
+.subBlaxText{position:absolute;left:50%;top:50%;width:100%;padding:0 1rem;transform:translate(-50%,-50%);text-align:center;font-size:max(3vw,1.1rem);text-shadow:0 0 15px #fff;animation:zoomInSub 1s ease forwards}
+@keyframes zoomInSub{0%{font-size:0}50%{font-size:max(3.5vw,1.2rem)}100%{font-size:max(3vw,1.1rem)}}
+.buttonList{position:absolute;left:0;right:0;top:63.5vh;display:flex;flex-direction:column;align-items:center;gap:max(1.5vh,.6rem)}
+.lbtn{width:max(6vw,6.5rem);height:max(2.25vw,2.4rem);font-size:max(1.3vw,1.1rem);border-radius:max(.85vw,.5rem);border:0;color:#3a3a3a;background:#fff;font-family:inherit;cursor:pointer;animation:zoomInButton 1s ease forwards}
+.lbtn.hv{animation:zoomIn .2s ease infinite alternate!important}.lbtn.ex{animation:zoomOut .2s ease!important}
+@keyframes zoomInButton{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes zoomIn{0%{transform:scale(1)}100%{transform:scale(1.1)}}@keyframes zoomOut{0%{transform:scale(1.1)}100%{transform:scale(1)}}
+.auth form{display:block}
+.headerText,.headerRegister{position:absolute;top:0;font-size:max(3.5vw,1.6rem);cursor:pointer;text-shadow:0 0 15px #fff;transition:.2s;user-select:none}.headerText{left:.75%}.headerRegister{right:.75%}
+.headerText:hover,.headerRegister:hover{transform:scale(.9);text-shadow:0 0 15px lightblue;color:lightblue}
+.loginText{position:absolute;left:50%;top:35%;transform:translate(-50%,-50%);font-size:max(7vw,2.6rem);text-shadow:0 0 15px #fff;white-space:nowrap}
+.usernameField,.passwordField{position:absolute;left:50%;transform:translateX(-50%);width:max(20vw,15rem);height:max(2.25vw,2.4rem);border:0;border-radius:max(.85vw,.5rem);background:#fff;color:#3a3a3a;caret-color:#3a3a3a;font-family:inherit;font-size:max(1.3vw,1rem);text-align:center;filter:drop-shadow(0 0 5px #fff);outline:0}
+.usernameField{top:47.5vh}.passwordField{top:55.5vh}
+.loginButton{position:absolute;left:50%;top:64.5vh;transform:translateX(-50%);width:max(6vw,6rem);height:max(2.25vw,2.4rem);border:0;border-radius:max(.85vw,.5rem);background:#fff;color:#3a3a3a;font-family:inherit;font-size:max(1.3vw,1.1rem);cursor:pointer;filter:drop-shadow(0 0 5px #fff);transition:.2s}
+.loginButton:hover{transform:translateX(-50%) scale(.9)}.loginButton:disabled{opacity:.6}
+.anote{position:absolute;left:50%;transform:translateX(-50%);bottom:1.2rem;width:90%;text-align:center}
+.pop.big{width:max(50vw,18rem);min-height:max(50vh,13rem);justify-content:center;gap:2.5vh}
+.pop.big h2{font-size:max(6.4vw,2.4rem);color:#fff;text-shadow:0 0 15px #000}.pop.big .t{font-size:max(3.4vw,1.1rem);color:#fff;text-shadow:0 0 15px #000;text-align:center}
+.pop.big .b{width:max(11vw,6.5rem);height:max(4.3vw,2.6rem);font-size:max(2.3vw,1.1rem);border-radius:max(.85vw,.5rem);filter:drop-shadow(0 0 15px #000)}
+.pop.err{box-shadow:0 0 15px darkred}
+.loadingModal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.6)}.lspin{position:absolute;left:50%;top:50%;font-size:5rem;text-shadow:0 0 14px #fff;animation:lspin 1s linear infinite}
+@keyframes lspin{0%{transform:translate(-50%,-50%) rotate(0)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
+.nws{max-height:55vh;overflow:auto;width:100%;text-align:left;padding-right:.3rem}.nws h3{margin:.4rem 0 0;color:#333;font-weight:400;font-size:1.15rem;text-shadow:none}.nws small{color:#999;font-size:.75rem}.nws p{margin:.15rem 0 .5rem;color:#555;font-size:.95rem;text-shadow:none;line-height:1.35}
+.rwd{position:fixed;left:0;right:0;margin:auto;top:.75%;width:max-content;min-width:10rem;background:#0f0f0f;text-align:center;border-radius:20px;padding:.8rem 1.4rem;z-index:90;font-size:1.5rem;filter:drop-shadow(0 0 15px #0f0f0f);animation:zoomInRwd .5s ease forwards;transition:opacity .5s ease}
+@keyframes zoomInRwd{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div id="app"></div>
+<div id="toast"></div>
+<script src="config.js"></script>
+<script>
+const FIREBASE_CONFIG=(window.FIREBASE_CONFIG&&!JSON.stringify(window.FIREBASE_CONFIG).includes('PASTE'))?window.FIREBASE_CONFIG:null;
+const START_ATOMS=300, DAILY=50;
+
+/* ===================== DATA ===================== */
+const RAR=['Common','Uncommon','Rare','Epic','Legendary','Fabled','Perfect','Mythical','Divine'];
+const COL={Common:'#fff',Uncommon:'#4bc22e',Rare:'#2a2aff',Epic:'#e00000',Legendary:'#ff910f',Fabled:'#1fa300',Perfect:'#fffacd',Mythical:'#a335ee',Divine:'#ee82ee'};
+const EL={},RT='curelfpmd';
+const CRATES=[
+ ['Noble',2500,'#6a2fc9','helium|Helium|l|200|75;neon|Neon|l|200|50;argon|Argon|l|200|45;krypton|Krypton|l|200|40;blueKrypton|Blue Krypton|f|300|5;xenon|Xenon|l|250|20;yellowXenon|Yellow Xenon|p|500|1;radon|Radon|l|200|65'],
+ ['Spungle',100,'#f6f03a','mrcarb|Mr. Carb|r|25|10;parkingticket|Park Tick|u|5|15;sqarward|Sqarward|e|75|2.5;frozenspungle|Frozen Spungle|u|5|17.5;garison|Garison|l|200|.5;beggingspungle|Begging Spungle|r|20|12.5;smilespungle|Smile Spungle|e|75|5;drugspungle|Drug Spungle|l|200|1;sqarspungle|Sqar Spungle|d|75000|.00002'],
+ ['Actino',75,'#d33a8e','actinium|Actinium|r|20|8;thorium|Thorium|u|5|15;protactinium|Protactinium|u|5|12.5;uranium|Uranium|l|250|.125;neptunium|Neptunium|r|20|5;plutonium|Plutonium|e|75|2'],
+ ['Transit',50,'#d1203a','scandium|Scandium|r|20|9;titanium|Titanium|l|200|.25;vanadium|Vanadium|r|20|7.5;chromium|Chromium|e|75|4;manganese|Manganese|u|5|15;iron|Iron|e|75|2.5;cobalt|Cobalt|l|200|.5;nickel|Nickel|r|20|8;copper|Copper|r|20|8;zinc|Zinc|u|5|15;yttrium|Yttrium|u|5|16;zirconium|Zirconium|r|20|10;niobium|Niobium|e|80|1.6;molybdenum|Molybdenum|u|5|14;technetium|Technetium|r|20|9;ruthenium|Ruthenium|r|20|9;rhodium|Rhodium|r|20|9;palladium|Palladium|u|5|19.5;silver|Silver|e|75|2.5;cadmium|Cadmium|r|20|7;hafnium|Hafnium|u|5|15;tantalum|Tantalum|r|20|8;tungsten|Tungsten|e|75|5;rhenium|Rhenium|u|5|17;osmium|Osmium|l|200|.4;iridium|Iridium|r|20|8;platinum|Platinum|l|250|.2;gold|Gold|l|200|.5;mercury|Mercury|l|200|.75'],
+ ['Lanthan',25,'#9a6a30','lanthanum|Lanthanum|e|75|5;cerium|Cerium|u|5|18;praseodymium|Praseodymium|l|200|.75;neodymium|Neodymium|e|75|4;promethium|Promethium|r|20|9;samarium|Samarium|u|5|16;europium|Europium|r|20|7.5;gadolinium|Gadolinium|u|5|16;terbium|Terbium|u|5|18;dysprosium|Dysprosium|r|20|6;holmium|Holmium|l|250|.175;erbium|Erbium|r|20|8;thulium|Thulium|u|5|19.5;ytterbium|Ytterbium|r|20|7;lutetium|Lutetium|r|20|8.5'],
+ ['Non',25,'#6fd11e','hydrogen|Hydrogen|u|5|17.5;carbon|Carbon|r|20|8;nitrogen|Nitrogen|u|5|15;oxygen|Oxygen|u|5|15;fluorine|Fluorine|l|200|.75;phosphorus|Phosphorus|r|20|7.5;sulfur|Sulfur|u|5|15;chlorine|Chlorine|r|20|8.5;selenium|Selenium|e|75|5;bromine|Bromine|l|250|.2;iodine|Iodine|e|75|2.5'],
+ ['Alkali',20,'#e0a500','lithium|Lithium|u|5|17.5;sodium|Sodium|r|20|10;potassium|Potassium|r|25|5.5;rubidium|Rubidium|r|20|8;caesium|Caesium|e|75|3;beryllium|Beryllium|r|20|8.5;magnesium|Magnesium|u|5|15;calcium|Calcium|u|5|17.5;strontium|Strontium|e|75|5;barium|Barium|u|5|15;radium|Radium|l|200|1'],
+ ['Metallo',15,'#19d19a','boron|Boron|u|5|15;silicon|Silicon|u|5|15;aluminium|Aluminium|r|20|7.5;gallium|Gallium|r|20|7.5;germanium|Germanium|r|20|7.5;arsenic|Arsenic|e|75|5;indium|Indium|u|5|18;tin|Tin|u|5|17;antimony|Antimony|u|5|12.5;tellurium|Tellurium|r|20|10;thallium|Thallium|r|20|7.5;lead|Lead|e|75|2.5;bismuth|Bismuth|d|25000|.000025;polonium|Polonium|u|5|18;astatine|Astatine|e|75|2']
+].map(c=>({name:c[0],price:c[1],color:c[2],items:c[3].split(';').map(s=>{const[k,n,t,p,w]=s.split('|'),i=RT.indexOf(t);EL[k]={name:n,r:i,price:+p,w:+w};return{n:k,i,w:+w}})}));
+const TOTAL=Object.keys(EL).length,nm=k=>EL[k]?EL[k].name:k;
+const NEWS=[
+ {t:'Betastar Reloaded',d:'10/25/2026',b:'A new decompile of Betastar. Friends, direct messages, profile bios and live global chat are now in the game.'},
+ {t:'New Spungle Crate Released',d:'07/20/2022',b:'A new crate has been released, Spungle Crate, so head over to the crates menu and check it out! Not only that, there is an element rarer than bismuth in the crate.'},
+ {t:'Chat Rewards',d:'05/30/2022',b:'You can now get chat rewards for chatting! Its a 10% chance per message and you can get up to 7 atoms max. Spamming will lead to a mute, so do not spam.'},
+ {t:'Rates Update',d:'05/14/2022',b:'You can now see the rates of the elements you can get in a crate now! Just click the Rates button on the buy crate popup.'},
+ {t:'Global Chat',d:'05/08/2022',b:'You can now globally chat with other users on Betastar! Just click the chat button on your top bar to go to the chat.'}
+];
+
+/* ===================== HELPERS ===================== */
+const $=(s,r=document)=>r.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n).toLocaleString(),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2400)}
+const hs=s=>{let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h};
+const tc={};
+function tex(n,o={}){const k=n+JSON.stringify(o);if(tc[k])return tc[k];const h=hs(n),hue=o.hue??h%360,sat=o.sat??.55,bf=(o.f??(.018+(h%40)/1000)).toFixed(3),
+ g=[0,120,240].map(a=>(1-sat+sat*(.55+.65*Math.max(0,Math.cos((hue+a)*Math.PI/180)))).toFixed(2));
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="${bf}" numOctaves="4" seed="${h%97}"/><feColorMatrix values="${g[0]} 0 0 0 .06 0 ${g[1]} 0 0 .06 0 0 ${g[2]} 0 .06 0 0 0 0 1"/></filter><rect width="120" height="120" filter="url(#f)"/></svg>`;
+ return tc[k]="url('data:image/svg+xml;utf8,"+encodeURIComponent(svg)+"')"}
+const CT={Noble:tex('Noble',{hue:28,f:.03}),Spungle:'radial-gradient(circle at 30% 30%,#c9b400 0 9%,transparent 11%) 0 0/30% 30%,radial-gradient(circle at 70% 60%,#d8c800 0 8%,transparent 10%) 0 0/38% 38%,#f2e83a',
+ Actino:tex('Actino',{hue:70,sat:.25}),Transit:tex('Transit',{sat:0,f:.06}),Lanthan:'radial-gradient(circle,#ff4a2a 0 16%,#a01010 24%,transparent 30%) 0 0/34% 34%,#3a0505',
+ Non:tex('Non',{sat:0,f:.02}),Alkali:tex('Alkali',{hue:220,sat:.2}),Metallo:tex('Metallo',{hue:20,sat:.25,f:.07})};
+async function hash(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch{let h=5381;for(const c of s)h=((h*33)^c.charCodeAt(0))>>>0;return'x'+h}}
+const nameCol=n=>`hsl(${hs(n)%360} 75% 72%)`;
+
+/* ===================== ICONS ===================== */
+const cube=(x,y,s)=>{const p=[[0,-1],[.87,-.5],[.87,.5],[0,1],[-.87,.5],[-.87,-.5]].map(a=>[x+a[0]*s,y+a[1]*s]);
+ return `<polygon points="${p.map(a=>a.join(',')).join(' ')}"/><path d="M${x},${y}L${p[1]}M${x},${y}L${p[5]}M${x},${y}L${p[3]}" stroke="#000" stroke-width="22" fill="none" stroke-linejoin="round"/>`};
+const ICONS={home:'<path d="M256 40L16 250h72v212h124V330h88v132h124V250h72z"/>',
+ leaders:'<path d="M128 40h256v140c0 72-54 130-128 130S128 252 128 180zM100 72H20c0 90 40 140 100 150zM412 72h80c0 90-40 140-100 150zM216 310h80v70h72v92H144v-92h72z"/>',
+ chat:'<path fill-rule="evenodd" d="M256 48C130 48 28 126 28 224c0 52 30 98 78 128-4 34-20 70-46 100 56-8 98-32 126-54 22 6 44 8 70 8 126 0 228-78 228-176S382 48 256 48zM144 200a28 28 0 100 56 28 28 0 000-56zm112 0a28 28 0 100 56 28 28 0 000-56zm112 0a28 28 0 100 56 28 28 0 000-56z"/>',
+ crates:'<path fill-rule="evenodd" d="M24 56h464v112H24zM56 192h400v272H56zM196 252h120v44H196z"/>',
+ elements:'<g>'+cube(256,128,112)+cube(140,330,112)+cube(372,330,112)+'</g>',
+ settings:'<path fill-rule="evenodd" d="M208 24h96l14 62 36 15 54-33 68 68-33 54 15 36 62 14v96l-62 14-15 36 33 54-68 68-54-33-36 15-14 62h-96l-14-62-36-15-54 33-68-68 33-54-15-36-62-14v-96l62-14 15-36-33-54 68-68 54 33 36-15zM256 176a80 80 0 100 160 80 80 0 000-160z"/>',
+ logout:'<path d="M40 48h200v56H96v304h144v56H40zM300 130l170 126-170 126v-88H170v-76h130z"/>'};
+const svg=k=>`<svg viewBox="0 0 512 512" data-go="${k}">${ICONS[k]}</svg>`;
+const ATOM='<svg class="atom" viewBox="0 0 512 512"><ellipse cx="256" cy="256" rx="230" ry="88"/><ellipse cx="256" cy="256" rx="230" ry="88" transform="rotate(60 256 256)"/><ellipse cx="256" cy="256" rx="230" ry="88" transform="rotate(120 256 256)"/><circle cx="256" cy="256" r="34" fill="#fff" stroke="none"/></svg>';
+
+/* ===================== STARFIELD ===================== */
+(function(){const c=$('#stars'),g=c.getContext('2d');let S=[];
+ function rs(){c.width=innerWidth;c.height=innerHeight;S=Array.from({length:Math.floor(innerWidth*innerHeight/6500)},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.1+.2,p:Math.random()*6.28,s:.4+Math.random()*1.2}))}
+ addEventListener('resize',rs);rs();
+ (function f(t){g.clearRect(0,0,c.width,c.height);g.fillStyle='#fff';for(const s of S){g.globalAlpha=.3+.5*Math.sin(t/1000*s.s+s.p)**2;g.fillRect(s.x,s.y,s.r,s.r)}requestAnimationFrame(f)})(0)})();
+
+/* ===================== BACKENDS ===================== */
+const mem={},store={get:k=>{try{return localStorage.getItem(k)}catch{return mem[k]??null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{mem[k]=v}},del:k=>{try{localStorage.removeItem(k)}catch{delete mem[k]}}};
+const newPlayer=(id,n)=>({id,name:n,lname:n.toLowerCase(),atoms:START_ATOMS,els:{},role:'Common',avatar:'',last:0,streak:0,bio:'',created:Date.now()});
+const pairId=(a,b)=>[a,b].sort().join('_');;
+const CHATMAX=200;
+/* 1) Local test mode: everything stays in this browser */
+const L={mode:'local',shared:false,
+ d:()=>JSON.parse(store.get('bs_local')||'{"players":{},"cred":{},"chat":[]}'),w:d=>store.set('bs_local',JSON.stringify(d)),
+ async get(id){return L.d().players[id]||null},async save(p){const d=L.d();d.players[p.id]=p;L.w(d)},
+ async del(id){const d=L.d();delete d.players[id];delete d.cred[id];L.w(d);store.del('bs_sess')},
+ async byName(l){return L.d().players[l]||null},
+ async register(n,p){const l=n.toLowerCase();if(L.d().players[l])return{err:'That username is already taken.'};const d=L.d();d.cred[l]=await hash(l+p);d.players[l]=newPlayer(l,n);L.w(d);store.set('bs_sess',l);return{pl:d.players[l]}},
+ async login(n,p){const l=n.toLowerCase(),d=L.d();if(!d.players[l]||d.cred[l]!==await hash(l+p))return{err:'Incorrect username or password.'};store.set('bs_sess',l);return{pl:d.players[l]}},
+ async restore(){const s=store.get('bs_sess');return s?L.get(s):null},async logout(){store.del('bs_sess')},
+ top(cb){cb(Object.values(L.d().players).sort((a,b)=>b.atoms-a.atoms).slice(0,10));return()=>{}},
+ ls:new Set(),notify(){L.ls.forEach(f=>f())},listen(fn){L.ls.add(fn);fn();return()=>L.ls.delete(fn)},
+ chatSub(cb){return L.listen(()=>cb(L.d().chat.slice(-60)))},
+ async chatSend(m){const d=L.d();d.chat.push(m);d.chat=d.chat.slice(-CHATMAX);L.w(d);L.notify()},
+ fd(){const d=L.d();d.friends=d.friends||{};d.dms=d.dms||{};return d},
+ friendsSub(cb){return L.listen(()=>cb(Object.entries(L.fd().friends).filter(([k,v])=>v.users.includes(P.id)).map(([k,v])=>({pair:k,...v}))))},
+ async friendReq(t){const d=L.fd();d.friends[pairId(P.id,t.id)]={users:[P.id,t.id],names:{[P.id]:P.name,[t.id]:t.name},from:P.id,status:'pending',ts:Date.now()};L.w(d);L.notify()},
+ async friendAccept(k){const d=L.fd();d.friends[k].status='accepted';L.w(d);L.notify()},
+ async friendDel(k){const d=L.fd();delete d.friends[k];L.w(d);L.notify()},
+ dmSub(k,cb){return L.listen(()=>cb((L.fd().dms[k]||[]).slice(-60)))},
+ async dmSend(k,m){const d=L.fd();(d.dms[k]=d.dms[k]||[]).push(m);d.dms[k]=d.dms[k].slice(-CHATMAX);L.w(d);L.notify()}};
+addEventListener('storage',e=>{if(e.key==='bs_local')L.notify()});
+/* 3) Firebase: real accounts + shared data for a self-hosted site */
+const F={mode:'firebase',shared:true,
+ async init(){const u='https://www.gstatic.com/firebasejs/10.12.2/',[a,au,fs]=await Promise.all([import(u+'firebase-app.js'),import(u+'firebase-auth.js'),import(u+'firebase-firestore.js')]);
+  F.au=au;F.fs=fs;const app=a.initializeApp(FIREBASE_CONFIG);F.auth=au.getAuth(app);F.db=fs.getFirestore(app);await F.auth.authStateReady()},
+ em:l=>l+'@betastar.game',pd:id=>F.fs.doc(F.db,'players',id),col:n=>F.fs.collection(F.db,n),
+ async get(id){const s=await F.fs.getDoc(F.pd(id));return s.exists()?s.data():null},async save(p){await F.fs.setDoc(F.pd(p.id),p)},
+ async del(id){await F.fs.deleteDoc(F.pd(id));try{await F.au.deleteUser(F.auth.currentUser)}catch(e){await F.au.signOut(F.auth)}},
+ async byName(l){const q=await F.fs.getDocs(F.fs.query(F.col('players'),F.fs.where('lname','==',l),F.fs.limit(1)));return q.empty?null:q.docs[0].data()},
+ fe(e){const c=e.code||'';return c==='auth/operation-not-allowed'?'Email/Password sign-in is not enabled in your Firebase project (Authentication → Sign-in method).':c==='auth/network-request-failed'?'Network error. Check your connection.':(c==='auth/invalid-api-key'||/api-key/.test(c))?'The apiKey in config.js is wrong.':c==='auth/unauthorized-domain'?'This website is not listed in Firebase → Authentication → Settings → Authorized domains.':c==='permission-denied'?'Firestore rules are blocking this. Publish firestore.rules.':'Error: '+(c||e.message)},
+ async register(n,p){const l=n.toLowerCase();let c;try{c=await F.au.createUserWithEmailAndPassword(F.auth,F.em(l),p)}catch(e){return{err:e.code==='auth/email-already-in-use'?'That username is already taken.':F.fe(e)}}
+  const pl=newPlayer(c.user.uid,n);try{await F.save(pl)}catch(e){try{await F.au.deleteUser(c.user)}catch(x){}return{err:F.fe(e)}}return{pl}},
+ async login(n,p){let c;try{c=await F.au.signInWithEmailAndPassword(F.auth,F.em(n.toLowerCase()),p)}catch(e){return{err:/invalid-credential|user-not-found|wrong-password|invalid-email/.test(e.code||'')?'Incorrect username or password.':F.fe(e)}}
+  try{const pl=await F.get(c.user.uid);return pl?{pl}:{err:'Profile not found.'}}catch(e){return{err:F.fe(e)} }},
+ async restore(){const u=F.auth.currentUser;return u?F.get(u.uid):null},async logout(){await F.au.signOut(F.auth)},
+ top(cb,err){return F.fs.onSnapshot(F.fs.query(F.col('players'),F.fs.orderBy('atoms','desc'),F.fs.limit(10)),s=>cb(s.docs.map(d=>d.data())),err)},
+ chatSub(cb,err){return F.fs.onSnapshot(F.fs.query(F.col('chat'),F.fs.orderBy('ts','desc'),F.fs.limit(60)),s=>cb(s.docs.map(d=>d.data()).reverse()),err)},
+ async chatSend(m){await F.fs.addDoc(F.col('chat'),m)},
+ fdoc:k=>F.fs.doc(F.db,'friends',k),
+ friendsSub(cb,err){return F.fs.onSnapshot(F.fs.query(F.col('friends'),F.fs.where('users','array-contains',P.id)),s=>cb(s.docs.map(d=>({pair:d.id,...d.data()}))),err)},
+ async friendReq(t){await F.fs.setDoc(F.fdoc(pairId(P.id,t.id)),{users:[P.id,t.id],names:{[P.id]:P.name,[t.id]:t.name},from:P.id,status:'pending',ts:Date.now()})},
+ async friendAccept(k){await F.fs.updateDoc(F.fdoc(k),{status:'accepted'})},async friendDel(k){await F.fs.deleteDoc(F.fdoc(k))},
+ dmSub(k,cb,err){return F.fs.onSnapshot(F.fs.query(F.fs.collection(F.db,'dms',k,'msgs'),F.fs.orderBy('ts','desc'),F.fs.limit(60)),s=>cb(s.docs.map(d=>d.data()).reverse()),err)},
+ async dmSend(k,m){await F.fs.addDoc(F.fs.collection(F.db,'dms',k,'msgs'),m)}};
+
+let B=L;
+async function initBackend(){if(FIREBASE_CONFIG){try{await F.init();B=F}catch(e){console.error(e);toast('Firebase failed to start — using test mode')}}}
+
+/* ===================== ACCOUNT STATE ===================== */
+let P=null,saving=false,dirty=false;
+async function persist(){dirty=true;if(saving||!P)return;saving=true;try{while(dirty){dirty=false;await B.save(P)}}catch(e){toast('Could not save your progress')}saving=false}
+function validate(n,p){if(!/^[A-Za-z0-9_]{3,16}$/.test(n))return'Username must be 3-16 letters, numbers or underscores.';if(p.length<6)return'Password must be at least 6 characters.'}
+async function doAuth(reg,n,p){const v=reg?validate(n,p):null;if(v)return v;let r;try{r=reg?await B.register(n,p):await B.login(n,p)}catch(e){return'Could not reach the server.'}
+ if(r.err)return r.err;P=r.pl;return null}
+async function logout(){try{await B.logout()}catch(e){}P=null;go('')}
+
+/* ===================== UI ===================== */
+let unsub=null,route='';
+function go(r){if(unsub){unsub();unsub=null}route=r;render()}
+function modal(html,mount,cls=''){const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="pop ${cls}">${html}</div>`;
+ const close=()=>m.remove();m.addEventListener('mousedown',e=>{if(e.target===m)close()});document.body.appendChild(m);mount&&mount(m,close);return m}
+const info=(t,msg,cls='')=>modal(`<h2>${esc(t)}</h2><div class="t">${esc(msg)}</div><button class="b" id="ok">Okay</button>`,(m,c)=>{$('#ok',m).onclick=c;$('#ok',m).focus()},cls);
+const errBox=m=>info('Error',m,'err big');
+function shell(page,inner){
+ const nav=P?`<nav>${['home','leaders','chat','crates','elements','settings','logout'].map(k=>svg(k).replace('<svg ',`<svg class="${k===page?'on':''}" `)).join('')}</nav>`:'';
+ $('#app').innerHTML=`<div><header><span class="logo" data-go="${P?'home':''}">Betastar</span>${nav}</header>${inner}</div>${P?`<div class="bal"><span id="bal">${fmt(P.atoms)}</span>${ATOM}</div>`:''}`;
+ $('#app').querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>e.dataset.go==='logout'?logout():go(e.dataset.go));shown=P?P.atoms:0}
+let shown=0,tw=0;
+function setBal(){const el=$('#bal');if(el)el.textContent=fmt(P.atoms)}
+
+/* ---------- loading, news, chat rewards ---------- */
+function showLoading(){if($('.loadingModal'))return;const m=document.createElement('div');m.className='loadingModal';m.innerHTML='<div class="lspin">B</div>';document.body.appendChild(m)}
+function hideLoading(){document.querySelectorAll('.loadingModal').forEach(n=>n.remove())}
+function showNews(){modal(`<h2>News</h2><div class="nws">${NEWS.map(n=>`<h3>${esc(n.t)} <small>${esc(n.d)}</small></h3><p>${esc(n.b)}</p>`).join('')}</div><button class="b" id="ok">Okay</button>`,(m,c)=>{$('#ok',m).onclick=c;$('#ok',m).focus()})}
+const RWD_COL=a=>a>50?'#0c7500':a>25?'#ff910f':a>12?'#be0000':a>7?'#0a14fa':a>3?'#4bc22e':'#fff';
+function ding(){try{const x=new(window.AudioContext||window.webkitAudioContext)(),o=x.createOscillator(),g=x.createGain();o.type='sine';o.frequency.setValueAtTime(880,x.currentTime);o.frequency.setValueAtTime(1320,x.currentTime+.09);
+ g.gain.setValueAtTime(.08,x.currentTime);g.gain.exponentialRampToValueAtTime(.001,x.currentTime+.4);o.connect(g);g.connect(x.destination);o.start();o.stop(x.currentTime+.4)}catch(e){}}
+function showReward(a){const d=document.createElement('div'),c=RWD_COL(a);d.className='rwd';d.style.color=c;d.style.textShadow=`0 0 25px ${c}`;d.textContent=`+${a} Atom${a>1?'s':''}`;document.body.appendChild(d);ding();
+ setTimeout(()=>{d.style.opacity=0},1500);setTimeout(()=>d.remove(),2100)}
+let lastRwd='';
+function chatReward(t){if(t.length<3||t===lastRwd)return;lastRwd=t;if(Math.random()>=.1)return; // 10% chance per message, 1-7 atoms
+ const a=Math.min(7,1+Math.floor(Math.pow(Math.random(),1.5)*7));P.atoms+=a;persist();setBal();showReward(a)}
+function hov(b,to){b.onmouseenter=()=>{b.classList.remove('ex');b.classList.add('hv')};b.onmouseleave=()=>{b.classList.remove('hv');b.classList.add('ex')};b.onclick=()=>go(to)}
+
+function landing(){$('#app').innerHTML=`<div class="land"><div class="blaxText">Betastar</div><div class="subBlaxText">A new decompile of betastar by <span class="yee">yeebus</span> (knockback).</div>
+ <div class="buttonList"><button class="lbtn" id="rb">Register</button><button class="lbtn" id="lgb">Login</button></div></div>`;hov($('#rb'),'register');hov($('#lgb'),'login')}
+function authPage(reg){
+ $('#app').innerHTML=`<div class="auth"><span class="headerText" id="lg">Betastar</span><span class="headerRegister" id="sw">${reg?'Login':'Register'}</span>
+ <div class="loginText">${reg?'Register':'Login'}</div>
+ <form id="af"><input class="usernameField" id="u" placeholder="Username" maxlength="16" autocomplete="username"><input class="passwordField" id="p" type="password" placeholder="Password" autocomplete="${reg?'new-password':'current-password'}"><input class="loginButton" id="sb" type="submit" value="${reg?'Register':'Login'}"></form>
+ <div class="note anote">${B.mode==='firebase'?'Connected to the game server.':'Test mode (Firebase not set up yet): accounts are saved in this browser only.'}</div></div>`;
+ $('#lg').onclick=()=>go('');$('#sw').onclick=()=>go(reg?'login':'register');$('#u').focus();
+ $('#af').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim(),p=$('#p').value;if(!n||!p)return errBox('Please fill in both fields.');
+  $('#sb').disabled=true;showLoading();const err=await doAuth(reg,n,p);hideLoading();$('#sb').disabled=false;err?errBox(err):go('home')}}
+
+let FRL=[];
+async function addFriend(x){if(x.id===P.id)return toast("That's you!");if(FRL.some(f=>f.users.includes(x.id)))return toast('Already friends or request pending');
+ try{await B.friendReq(x);toast('Friend request sent!')}catch(e){toast('Could not send request')}}
+function editBio(){modal(`<h2>Your Bio</h2><div class="t">Add your Discord, YouTube or anything else.</div><textarea class="ta" id="bt" maxlength="150" placeholder="Discord: name · YouTube: link"></textarea><div class="rw"><button class="b" id="y">Save</button><button class="b" id="n">Cancel</button></div>`,(m,c)=>{
+ $('#bt',m).value=P.bio||'';$('#n',m).onclick=c;$('#y',m).onclick=()=>{P.bio=$('#bt',m).value.trim().slice(0,150);persist();c();home()}})}
+function home(){const av=P.avatar&&EL[P.avatar],c=av?COL[RAR[av.r]]:'#4cff4c',b=(bg,fg,g)=>`style="background:${bg};color:${fg};--g:${g}"`;
+ shell('home',`<div class="home"><div class="side"><button id="d" ${b('#9ff09f','#111','#7f7')}>Daily Rewards</button><button id="nw" ${b('#8ed3ee','#111','#8ed3ee')}>News</button>
+  <button id="fr" ${b('#d9b8ff','#111','#c9a3ff')}>Friends <span class="bd" id="bd"></span></button><button id="bi" ${b('#ffd98a','#111','#ffd98a')}>Edit Bio</button></div>
+  <div class="prof"><div class="av" style="--c:${c};${P.avatar?'background-image:'+tex(P.avatar):''}"></div><h1 style="--c:${c}">${esc(P.name)}</h1><p>Role: ${esc(P.role)}</p><p>Atoms: ${fmt(P.atoms)}</p>
+  <input class="pill" id="un" placeholder="Enter Username Here"><button class="pill" id="vs">View Stats</button><button class="pill" id="tr">Trade</button>
+  <div class="biobox"><div class="bh">Bio</div>${P.bio?esc(P.bio):'<span style="opacity:.5">No bio yet — press Edit Bio to add your Discord, YouTube and more.</span>'}</div></div></div>`);
+ $('#d').onclick=()=>{const left=P.last+864e5-Date.now();if(left>0)return toast(`Come back in ${Math.ceil(left/36e5)}h`);
+  P.streak=Date.now()-P.last<1728e5?(P.streak||0)+1:1;const g=DAILY+Math.min(P.streak,7)*10;P.last=Date.now();P.atoms+=g;persist();toast(`+${g} atoms — ${P.streak} day streak!`);home()};
+ $('#nw').onclick=showNews;$('#fr').onclick=()=>go('friends');$('#bi').onclick=editBio;$('#tr').onclick=()=>toast('Trading is not available yet');
+ $('#vs').onclick=async()=>{const n=$('#un').value.trim();if(!n)return;let x;try{x=await B.byName(n.toLowerCase())}catch(e){}
+  if(!x)return errBox('User not found.');
+  modal(`<h2>${esc(x.name)}</h2><div class="t">Role: ${esc(x.role)}<br>Atoms: ${fmt(x.atoms)}<br>Elements: ${Object.values(x.els||{}).reduce((a,b)=>a+b,0)}${x.bio?`<br><br>${esc(x.bio)}`:''}</div>${x.id!==P.id?'<button class="b" id="af">Add Friend</button>':''}<button class="b" id="ok">Okay</button>`,(m,c)=>{$('#ok',m).onclick=c;const a=$('#af',m);if(a)a.onclick=()=>{c();addFriend(x)}})}
+ try{unsub=B.friendsSub(l=>{FRL=l;const n=l.filter(f=>f.status==='pending'&&f.from!==P.id).length,e=$('#bd');if(e){e.textContent=n||'';e.style.display=n?'inline-block':'none'}})}catch(e){}}
+
+function leaders(){const rk=['1st','2nd','3rd'],rc=['#ffd700','#fff','#ff9a2e'];
+ shell('leaders',`<div class="lb">${Array.from({length:10},(_,i)=>`<div class="row"><span class="n"></span><span class="r" style="color:${rc[i]||'#fff'}">${rk[i]||(i+1)+'th'}</span><span class="a"></span></div>`).join('')}</div>`);
+ const fill=l=>document.querySelectorAll('.row').forEach((r,i)=>{const p=l[i];r.querySelector('.n').textContent=p?p.name:'';r.querySelector('.n').style.color=p&&p.id===P.id?'#8ed0ff':'#fff';r.querySelector('.a').textContent=p?fmt(p.atoms):''});
+ try{unsub=B.top(fill,()=>toast('Leaderboard unavailable'))}catch(e){toast('Leaderboard unavailable')}}
+
+let lastSend=0;
+function makeDraw(cb){let first=true;const f=list=>{const near=cb.scrollHeight-cb.scrollTop-cb.clientHeight<80||first;
+ cb.innerHTML=list.map(m=>`<div class="msg"><i>${new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</i><b style="color:${nameCol(m.name)}">${esc(m.name)}</b>${esc(m.text)}</div>`).join('')||'<div class="msg" style="opacity:.5">No messages yet — say hi!</div>';
+ first=false;if(near)cb.scrollTop=cb.scrollHeight};f.reset=()=>{first=true};return f}
+function chat(){shell('chat',`<div class="chat"><div class="cbox" id="cb"></div><form class="cin" id="cf"><input class="fld" id="ci" placeholder="Type a message…" maxlength="${CHATMAX}" autocomplete="off"><input class="btn" type="submit" value="Send"></form></div>`);
+ try{unsub=B.chatSub(makeDraw($('#cb')),()=>toast('Chat unavailable'))}catch(e){toast('Chat unavailable')}
+ $('#cf').onsubmit=async e=>{e.preventDefault();const t=$('#ci').value.replace(/\s+/g,' ').trim();if(!t)return;
+  if(Date.now()-lastSend<1200)return toast('Slow down!');lastSend=Date.now();$('#ci').value='';
+  try{await B.chatSend({uid:P.id,name:P.name,text:t.slice(0,CHATMAX),ts:Date.now()});chatReward(t)}catch(x){toast('Message failed to send')}};$('#ci').focus()}
+
+function friends(){let dmPair=null,dmu=null;
+ shell('home',`<div class="fr"><div class="flist"><div class="fh">Friends</div><input class="pill" id="fn" placeholder="Add friend by username" maxlength="16"><button class="pill" id="fb">Send Request</button><div id="fl"></div></div>
+ <div class="dm"><div class="dh" id="dh">Select a friend to message</div><div class="cbox" id="dbx"></div><form class="cin" id="df"><input class="fld" id="di" placeholder="Message…" maxlength="${CHATMAX}" autocomplete="off" disabled><input class="btn" type="submit" value="Send"></form></div></div>`);
+ const draw=makeDraw($('#dbx'));
+ const closeDm=()=>{dmu&&dmu();dmu=null;dmPair=null;$('#dh').textContent='Select a friend to message';$('#di').disabled=true;$('#dbx').innerHTML=''};
+ const openDm=(pair,name)=>{dmu&&dmu();dmPair=pair;$('#dh').textContent=name;$('#di').disabled=false;$('#di').focus();draw.reset();
+  try{dmu=B.dmSub(pair,draw,()=>toast('Messages unavailable'))}catch(e){toast('Messages unavailable')}list()};
+ function list(){const me=P.id,oth=f=>f.users.find(x=>x!==me),nm=f=>esc(f.names[oth(f)]);
+  const req=FRL.filter(f=>f.status==='pending'&&f.from!==me),out=FRL.filter(f=>f.status==='pending'&&f.from===me),fr=FRL.filter(f=>f.status==='accepted');
+  $('#fl').innerHTML=(req.length?'<div class="fs">Requests</div>':'')+req.map(f=>`<div class="fi"><span>${nm(f)}</span><span><button class="mini" data-a="${f.pair}">Accept</button> <button class="mini" data-d="${f.pair}">Decline</button></span></div>`).join('')
+   +(fr.length?'<div class="fs">Friends</div>':'')+fr.map(f=>`<div class="fi${f.pair===dmPair?' sel':''}" data-o="${f.pair}" data-n="${nm(f)}"><span>${nm(f)}</span><button class="mini" data-d="${f.pair}">Remove</button></div>`).join('')
+   +(out.length?'<div class="fs">Sent</div>':'')+out.map(f=>`<div class="fi"><span>${nm(f)}</span><button class="mini" data-d="${f.pair}">Cancel</button></div>`).join('')
+   +(FRL.length?'':'<div class="fs">No friends yet — send a request!</div>')}
+ $('#fl').onclick=async e=>{const t=e.target,a=t.dataset.a,d=t.dataset.d,o=t.closest('[data-o]');
+  try{if(a)await B.friendAccept(a);else if(d){await B.friendDel(d);if(d===dmPair)closeDm()}else if(o)openDm(o.dataset.o,o.dataset.n)}catch(x){toast('Action failed')}};
+ $('#fb').onclick=async()=>{const n=$('#fn').value.trim();if(!n)return;let x;try{x=await B.byName(n.toLowerCase())}catch(e){}if(!x)return errBox('User not found.');$('#fn').value='';addFriend(x)};
+ $('#df').onsubmit=async e=>{e.preventDefault();const t=$('#di').value.replace(/\s+/g,' ').trim();if(!t||!dmPair)return;if(Date.now()-lastSend<1200)return toast('Slow down!');lastSend=Date.now();$('#di').value='';
+  try{await B.dmSend(dmPair,{from:P.id,name:P.name,text:t.slice(0,CHATMAX),ts:Date.now()})}catch(x){toast('Message failed to send')}};
+ let fu=()=>{};try{fu=B.friendsSub(l=>{FRL=l;list();if(dmPair&&!FRL.some(f=>f.pair===dmPair&&f.status==='accepted'))closeDm()},()=>toast('Friends unavailable'))}catch(e){toast('Friends unavailable')}
+ unsub=()=>{fu();dmu&&dmu()}}
+
+function settings(){shell('settings',`<div class="center"><div class="title" style="font-size:3rem">Settings</div><div class="tag">Signed in as ${esc(P.name)}</div>
+ <button class="btn" id="lo">Log out</button><button class="btn" id="de" style="background:#e55;color:#fff;filter:none">Delete account</button></div>`);
+ $('#lo').onclick=logout;$('#de').onclick=()=>modal('<h2>Delete your account?</h2><div class="t">This permanently removes your atoms and elements.</div><div class="rw"><button class="b" id="y">Yes</button><button class="b" id="n">No</button></div>',(m,c)=>{
+  $('#n',m).onclick=c;$('#y',m).onclick=async()=>{c();try{await B.del(P.id)}catch(e){}P=null;go('')}})}
+
+function crates(){
+ shell('crates',`<div class="crates">${CRATES.map((c,i)=>`<div class="crate${c.name==='Spungle'?' sol':''}" style="--c:${c.color}" data-i="${i}"><div class="nm">${c.name} Crate</div><div class="ct" style="background:${CT[c.name]}${CT[c.name].startsWith('url')?' center/cover':''}"></div><div class="pr">${fmt(c.price)} ${ATOM}</div></div>`).join('')}</div>`);
+ document.querySelectorAll('.crate').forEach(e=>e.onclick=()=>buy(CRATES[e.dataset.i]))}
+const wsum=c=>c.items.reduce((a,x)=>a+x.w,0);
+function rates(c){const t=wsum(c),by={};c.items.forEach(x=>by[x.i]=(by[x.i]||0)+x.w/t*100);
+ modal(`<h2 style="color:#444;text-shadow:none">${c.name} Crate Rates</h2>${Object.keys(by).sort((a,b)=>a-b).map(i=>`<div class="t" style="color:${RAR[i]==='Common'?'#555':COL[RAR[i]]}">${RAR[i]}: ${by[i]<1?+by[i].toFixed(6):by[i].toFixed(1)}%</div>`).join('')}<button class="b" id="ok">Okay</button>`,(m,x)=>$('#ok',m).onclick=x)}
+function roll(c){let r=Math.random()*wsum(c);for(const x of c.items){if((r-=x.w)<=0)return x}return c.items[0]}
+function buy(c){modal(`<h2>Purchase the ${c.name} Crate for ${fmt(c.price)} atoms?</h2><button class="b" id="rt">Rates</button><div class="rw"><button class="b" id="y">Yes</button><button class="b" id="n">No</button></div>`,(m,close)=>{
+ $('#rt',m).onclick=()=>rates(c);$('#n',m).onclick=close;
+ $('#y',m).onclick=async()=>{close();if(P.atoms<c.price)return toast('Not enough atoms');
+  P.atoms-=c.price;const it=roll(c),isNew=!P.els[it.n];P.els[it.n]=(P.els[it.n]||0)+1;persist();setBal();
+  const sp=document.createElement('div');sp.className='bsp';sp.textContent='B';document.body.appendChild(sp);await sleep(1500);sp.remove();reveal(it,isNew)}})}
+function reveal(it,isNew){const col=COL[RAR[it.i]],d=document.createElement('div');d.className='reveal';
+ d.innerHTML=`<div class="rn">${nm(it.n)}</div><div class="rt" style="background-image:${tex(it.n)}">${isNew?'<span class="nw">NEW!</span>':''}</div><div class="rr" style="color:${col};text-shadow:0 0 22px ${col}">${RAR[it.i]}</div>`;
+ const cv=document.createElement('canvas');cv.id='pc';cv.width=innerWidth;cv.height=innerHeight;document.body.append(d,cv);
+ const g=cv.getContext('2d'),mk=(burst)=>{const a=Math.random()*6.28,s=burst?2+Math.random()*(5+it.i):0;return{x:burst?cv.width/2:Math.random()*cv.width,y:burst?cv.height/2:-10,vx:Math.cos(a)*s,vy:burst?Math.sin(a)*s-1.5:.5+Math.random()*.9,r:Math.random()*6,w:2+Math.random()*2.5,h:4+Math.random()*6,life:0,max:230+Math.random()*120}};
+ let Q=Array.from({length:80+it.i*30},()=>mk(true)),t0=performance.now();
+ (function f(t){if(!d.isConnected)return cv.remove();g.clearRect(0,0,cv.width,cv.height);g.fillStyle=col;const el=t-t0;
+  if(el<3400)Q.push(mk(false));
+  Q=Q.filter(p=>{p.life++;p.x+=p.vx;p.y+=p.vy;p.vy+=.02;p.vx*=.99;p.r+=.1;g.globalAlpha=Math.max(0,1-p.life/p.max);g.save();g.translate(p.x,p.y);g.rotate(p.r);g.fillRect(-p.w/2,-p.h/2,p.w,p.h);g.restore();return p.life<p.max});
+  requestAnimationFrame(f)})(t0);
+ const end=()=>{d.classList.add('out');setTimeout(()=>d.remove(),850)};d.onclick=end;setTimeout(()=>d.isConnected&&end(),6200)}
+
+let sel=null,view='own';
+function elements(){const own=Object.keys(P.els).filter(k=>EL[k]&&P.els[k]>0).sort((a,b)=>EL[b].r-EL[a].r||a.localeCompare(b));
+ if(!own.includes(sel))sel=own[0]||null;const e=sel&&EL[sel],col=e?COL[RAR[e.r]]:'#fff';
+ const star="url('data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#111"/><path d="M50 12l11 26 28 3-21 19 6 28-24-15-24 15 6-28-21-19 28-3z" fill="#fff"/></svg>')+"')";
+ const all=Object.keys(EL).sort((a,b)=>EL[b].r-EL[a].r||a.localeCompare(b));
+ const tiles=view==='own'?(own.length?own.map((k,i)=>`<div class="gt${k===sel?' s':''}" data-k="${k}" title="${nm(k)}" style="background-image:${tex(k)}"></div>`).join(''):'<span style="opacity:.5">Open a crate to collect elements</span>')
+  :all.map((k,i)=>{const o=P.els[k]>0;return`<div class="gt${o?'':' lock'}${k===sel?' s':''}" data-k="${k}" data-o="${o?1:0}" title="${o?nm(k):'???'} · ${RAR[EL[k].r]}" style="background-image:${tex(k)};border-color:${o?COL[RAR[EL[k].r]]==='#2a2aff'?'#6a6aff':'#fff':'#555'}"></div>`}).join('');
+ shell('elements',`<div class="pan"><div class="box" style="color:${col};text-shadow:0 0 18px ${col}">${e?RAR[e.r]:'Common'}</div>
+  <div style="text-align:center"><div class="etile" id="big" style="background-image:${sel?tex(sel):star}"><span class="qty">${sel?P.els[sel]:1}</span></div><div style="font-size:1.2rem;margin-top:.5rem">${sel?nm(sel):'Betastar'}</div></div>
+  <div class="box" style="font-size:${e?1.6:1.1}rem;text-shadow:0 0 12px #fff">${e?fmt(e.price)+' Atoms':"Can't be sold."}</div></div>
+  <div class="tabs"><span data-v="own" class="${view==='own'?'on':''}">Owned</span><span data-v="all" class="${view==='all'?'on':''}">Collection ${own.length}/${TOTAL}</span></div><div class="grid">${tiles}</div>`);
+ document.querySelectorAll('.tabs span').forEach(t=>t.onclick=()=>{view=t.dataset.v;elements()});
+ document.querySelectorAll('.gt').forEach(t=>t.onclick=()=>{if(view==='all'&&t.dataset.o==='0')return toast('Not discovered yet');sel=t.dataset.k;view='own';elements()});
+ $('#big').onclick=$('#big').oncontextmenu=ev=>{ev.preventDefault();document.querySelector('.menu')?.remove();
+  const m=document.createElement('div');m.className='menu';m.style.cssText=`left:${Math.min(ev.clientX,innerWidth-140)}px;top:${ev.clientY}px`;
+  m.innerHTML=(sel?'<p id="s">Sell Element</p>':'')+'<p id="a">Set Avatar</p>';document.body.appendChild(m);
+  const rm=()=>{m.remove();removeEventListener('mousedown',out)},out=x=>{if(!m.contains(x.target))rm()};setTimeout(()=>addEventListener('mousedown',out));
+  $('#a',m).onclick=()=>{P.avatar=sel||'';persist();rm();toast('Avatar updated!')};if(sel)$('#s',m).onclick=()=>{rm();sell()}}}
+function sell(){const k=sel,max=P.els[k];
+ modal(`<h2>How much ${nm(k)} would you like to sell?</h2><div class="t"><input class="fld" id="q" inputmode="numeric" style="width:6rem;height:1.8rem;filter:none;background:#eee"> / ${max}</div><div class="rw"><button class="b" id="y">Sell</button><button class="b" id="n">Cancel</button></div>`,(m,close)=>{
+  const q=$('#q',m);q.focus();q.oninput=()=>{let v=q.value.replace(/\D/g,'');if(v&&+v>max)v=String(max);q.value=v};
+  $('#n',m).onclick=close;$('#y',m).onclick=()=>{const n=+q.value;if(!(n>0))return;P.els[k]-=n;P.atoms+=n*EL[k].price;if(!P.els[k])delete P.els[k];persist();close();toast(`Sold ${n} ${nm(k)}`);elements();setBal()}})}
+
+/* ===================== ROUTER / BOOT ===================== */
+const PAGES={'':landing,login:()=>authPage(false),register:()=>authPage(true),home,leaders,chat,friends,crates,elements,settings};
+function render(){let r=route in PAGES?route:'';if(P&&(r===''||r==='login'||r==='register'))r='home';if(!P&&r!==''&&r!=='login'&&r!=='register')r='';route=r;PAGES[r]()}
+console.log('%c%s','color: white; font-size: 100px;text-shadow: 0px 0px 20px black;','Hold Up!');
+console.log('%c%s','color: white; font-size: 25px;text-shadow: 0px 0px 5px red;',"If someone told you to copy/paste something here you have an 11/10 chance you're being scammed.");
+console.log('%c%s','color: white; font-size: 35px;text-shadow: 0px 0px 10px darkred;','Pasting anything in here could give attackers access to your Betastar account.');
+(async function boot(){await initBackend();try{P=await B.restore()}catch(e){}render()})();
+</script>
+</body>
+</html>
