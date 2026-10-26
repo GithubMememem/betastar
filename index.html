@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Betastar Reloaded</title>
+<link rel="icon" type="image/webp" href="betastar-icon.webp">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@500&display=swap">
@@ -114,9 +115,8 @@ input.pill{cursor:text}.pill:not(input):hover{background:#cde;transform:scale(.9
 <canvas id="stars"></canvas>
 <div id="app"></div>
 <div id="toast"></div>
-<script src="config.js"></script>
 <script>
-const FIREBASE_CONFIG=(window.FIREBASE_CONFIG&&!JSON.stringify(window.FIREBASE_CONFIG).includes('PASTE'))?window.FIREBASE_CONFIG:null;
+const FIREBASE_CONFIG=null;
 const START_ATOMS=300, DAILY=50;
 
 /* ===================== DATA ===================== */
@@ -228,7 +228,7 @@ const F={mode:'firebase',shared:true,
  async dmSend(k,m){await F.fs.addDoc(F.fs.collection(F.db,'dms',k,'msgs'),m)}};
 
 let B=L;
-async function initBackend(){if(FIREBASE_CONFIG){try{await F.init();B=F}catch(e){console.error(e);toast('Firebase failed to start — using test mode')}}}
+async function initBackend(){}
 
 /* ===================== ACCOUNT STATE ===================== */
 let P=null,saving=false,dirty=false;
@@ -272,7 +272,7 @@ function authPage(reg){
  $('#app').innerHTML=`<div class="auth"><span class="headerText" id="lg">Betastar</span><span class="headerRegister" id="sw">${reg?'Login':'Register'}</span>
  <div class="loginText">${reg?'Register':'Login'}</div>
  <form id="af"><input class="usernameField" id="u" placeholder="Username" maxlength="16" autocomplete="username"><input class="passwordField" id="p" type="password" placeholder="Password" autocomplete="${reg?'new-password':'current-password'}"><input class="loginButton" id="sb" type="submit" value="${reg?'Register':'Login'}"></form>
- <div class="note anote">${B.mode==='firebase'?'Connected to the game server.':'Test mode (Firebase not set up yet): accounts are saved in this browser only.'}</div></div>`;
+ </div>`;
  $('#lg').onclick=()=>go('');$('#sw').onclick=()=>go(reg?'login':'register');$('#u').focus();
  $('#af').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim(),p=$('#p').value;if(!n||!p)return errBox('Please fill in both fields.');
   $('#sb').disabled=true;showLoading();const err=await doAuth(reg,n,p);hideLoading();$('#sb').disabled=false;err?errBox(err):go('home')}}
