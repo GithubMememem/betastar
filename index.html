@@ -180,6 +180,40 @@ button.picklet-button{margin-bottom:5px;transition:all .3s cubic-bezier(.175,.88
 button.picklet-button:hover{transform:translateY(-2px);filter:brightness(1.1)}
 button.picklet-button:active{transform:translateY(0)}
 
+
+/* Blacket-inspired effects adapted for Betastar Reloaded */
+.rainbow{
+  background:linear-gradient(90deg,#ff4d6d,#ffb84d,#f7f052,#4de38b,#4db8ff,#b56bff,#ff4d6d);
+  background-size:300% 100%;
+  background-clip:text;-webkit-background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  animation:textShine 5s linear infinite;
+  text-shadow:0 .05em rgba(0,0,0,.18);
+}
+@keyframes textShine{from{background-position:0% 50%}to{background-position:300% 50%}}
+.float{animation:betastarFloat 2.5s ease-in-out infinite}
+@keyframes betastarFloat{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
+button.btn,button.lbtn{
+  position:relative;
+  box-shadow:0 4px 0 rgba(0,0,0,.32),0 0 5px rgba(255,255,255,.12);
+  transition:transform .25s cubic-bezier(.3,.7,.4,1.2),filter .25s,box-shadow .25s;
+}
+button.btn:hover,button.lbtn:hover{
+  filter:brightness(1.1);
+  transform:translateY(-2px);
+  box-shadow:0 6px 0 rgba(0,0,0,.32),0 0 9px rgba(255,255,255,.16);
+}
+button.btn:active,button.lbtn:active{
+  transform:translateY(2px);
+  box-shadow:0 1px 0 rgba(0,0,0,.32);
+  transition-duration:34ms;
+}
+input.loginButton:hover{transform:translateX(-50%) translateY(-2px) scale(1)}
+input.loginButton:active{transform:translateX(-50%) translateY(1px);box-shadow:0 2px var(--color-green-700)}
+@media(prefers-reduced-motion:reduce){
+  .rainbow,.float{animation:none}
+}
+
 </style>
 
 </head>
