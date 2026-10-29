@@ -482,7 +482,8 @@ function elements(){const own=Object.keys(P.els).filter(k=>EL[k]&&P.els[k]>0).so
  shell('elements',`<div class="pan"><div class="box" style="color:${col};text-shadow:0 0 18px ${col}">${e?RAR[e.r]:'Common'}</div>
   <div style="text-align:center"><div class="etile" id="big" style="background-image:${sel?tex(sel):star}"><span class="qty">${sel?P.els[sel]:1}</span></div><div style="font-size:1.2rem;margin-top:.5rem">${sel?nm(sel):'Betastar'}</div></div>
   <div class="box" style="font-size:${e?1.6:1.1}rem;text-shadow:0 0 12px #fff">${e?fmt(e.price)+' Atoms':"Can't be sold."}</div></div>
-  <div class="tabs"><span data-v="own" class="${view==='own'?'on':''}">Owned</span><span data-v="all" class="${view==='all'?'on':''}">Collection ${own.length}/${TOTAL}</span></div><div class="grid">${tiles}</div>`);
+  <div class="qolrow"><input class="fld" id="elementSearch" placeholder="Search your collection…" aria-label="Search elements"></div><div class="tabs"><span data-v="own" class="${view==='own'?'on':''}">Owned</span><span data-v="all" class="${view==='all'?'on':''}">Collection ${own.length}/${TOTAL}</span></div><div class="grid">${tiles}</div>`);
+ $('#elementSearch').oninput=()=>{const q=$('#elementSearch').value.trim().toLowerCase();document.querySelectorAll('.gt').forEach(t=>{const name=nm(t.dataset.k).toLowerCase();t.style.display=name.includes(q)?'':'none'})};
  document.querySelectorAll('.tabs span').forEach(t=>t.onclick=()=>{view=t.dataset.v;elements()});
  document.querySelectorAll('.gt').forEach(t=>t.onclick=()=>{if(view==='all'&&t.dataset.o==='0')return toast('Not discovered yet');sel=t.dataset.k;view='own';elements()});
  $('#big').onclick=$('#big').oncontextmenu=ev=>{ev.preventDefault();document.querySelector('.menu')?.remove();
