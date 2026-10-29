@@ -222,7 +222,7 @@ const pairId=(a,b)=>[a,b].sort().join('_');;
 const CHATMAX=200;
 /* 1) Local test mode: everything stays in this browser */
 const L={mode:'local',shared:false,
- d:()=>JSON.parse(store.get('bs_local')||'{"players":{},"cred":{},"chat":[]}'),w:d=>store.set('bs_local',JSON.stringify(d)),
+ d:()=>{const d=JSON.parse(store.get('bs_local')||'{"players":{},"cred":{},"chat":[]}');d.trades=d.trades||{};d.friends=d.friends||{};d.dms=d.dms||{};return d},w:d=>store.set('bs_local',JSON.stringify(d)),
  async get(id){return L.d().players[id]||null},async save(p){const d=L.d();d.players[p.id]=p;L.w(d)},
  async del(id){const d=L.d();delete d.players[id];delete d.cred[id];L.w(d);store.del('bs_sess')},
  async byName(l){return L.d().players[l]||null},
@@ -246,12 +246,16 @@ const L={mode:'local',shared:false,
  async friendDel(k){const d=L.fd();delete d.friends[k];L.w(d);L.notify()},
  dmSub(k,cb){return L.listen(()=>cb((L.fd().dms[k]||[]).slice(-60)))},
  async dmSend(k,m){const d=L.fd();(d.dms[k]=d.dms[k]||[]).push({...m,id:m.id||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2))});d.dms[k]=d.dms[k].slice(-CHATMAX);L.w(d);L.notify()},
- async dmDel(k,id){const d=L.fd(),a=d.dms[k]||[],m=a.find(x=>x.id===id);if(!m)return;if(m.from!==P.id&&!isOwner())throw Error('Not allowed');d.dms[k]=a.filter(x=>x.id!==id);L.w(d);L.notify()}};
+ async dmDel(k,id){const d=L.fd(),a=d.dms[k]||[],m=a.find(x=>x.id===id);if(!m)return;if(m.from!==P.id&&!isOwner())throw Error('Not allowed');d.dms[k]=a.filter(x=>x.id!==id);L.w(d);L.notify()},
+ async tradeCreate(t){const d=L.d(),id='t'+Date.now().toString(36)+Math.random().toString(36).slice(2);d.trades[id]={...t,id};L.w(d);L.notify();return id},
+ tradesSub(cb){return L.listen(()=>cb(Object.values(L.d().trades||{}).filter(t=>(t.participants||[]).includes(P.id)).sort((a,b)=>b.ts-a.ts)))},
+ async tradeRespond(id,action){const d=L.d(),t=d.trades[id];if(!t||t.to!==P.id||t.status!=='pending')throw Error('Trade is no longer available');if(action==='decline'){t.status='declined';L.w(d);L.notify();return}
+ const a=d.players[t.from],b=d.players[t.to];if(!a||!b)throw Error('Player not found');const move=(src,dst,p)=>{const n=Number(p.atoms)||0;if(!Number.isSafeInteger(n)||n<0||src.atoms<n)throw Error('Not enough atoms');src.atoms-=n;dst.atoms+=n;for(const [k,q0] of Object.entries(p.els||{})){const q=Number(q0)||0;if(!Number.isSafeInteger(q)||q<0||(src.els[k]||0)<q)throw Error('Not enough elements');src.els[k]=(src.els[k]||0)-q;if(!src.els[k])delete src.els[k];dst.els[k]=(dst.els[k]||0)+q}};move(a,b,t.offer||{atoms:0,els:{}});move(b,a,t.want||{atoms:0,els:{}});t.status='accepted';t.resolvedAt=Date.now();d.players[a.id]=a;d.players[b.id]=b;L.w(d);if(a.id===P.id)Object.assign(P,a);if(b.id===P.id)Object.assign(P,b);L.notify();return true}};
 addEventListener('storage',e=>{if(e.key==='bs_local')L.notify()});
 /* 3) Firebase: real accounts + shared data for a self-hosted site */
 const F={mode:'firebase',shared:true,
- async init(){const u='https://www.gstatic.com/firebasejs/10.12.2/',[a,au,fs]=await Promise.all([import(u+'firebase-app.js'),import(u+'firebase-auth.js'),import(u+'firebase-firestore.js')]);
-  F.au=au;F.fs=fs;const app=a.initializeApp(FIREBASE_CONFIG);F.auth=au.getAuth(app);F.db=fs.getFirestore(app);await F.auth.authStateReady()},
+ async init(){const u='https://www.gstatic.com/firebasejs/10.12.2/',[a,au,fs,fn]=await Promise.all([import(u+'firebase-app.js'),import(u+'firebase-auth.js'),import(u+'firebase-firestore.js'),import(u+'firebase-functions.js')]);
+  F.au=au;F.fs=fs;F.fn=fn;const app=a.initializeApp(FIREBASE_CONFIG);F.auth=au.getAuth(app);F.db=fs.getFirestore(app);F.funcs=fn.getFunctions(app);F.respondTrade=fn.httpsCallable(F.funcs,'respondToTrade');await F.auth.authStateReady()},
  em:l=>l+'@betastar.game',pd:id=>F.fs.doc(F.db,'players',id),col:n=>F.fs.collection(F.db,n),
  async get(id){const s=await F.fs.getDoc(F.pd(id));return s.exists()?s.data():null},async save(p){await F.fs.setDoc(F.pd(p.id),p)},
  async del(id){await F.fs.deleteDoc(F.pd(id));try{await F.au.deleteUser(F.auth.currentUser)}catch(e){await F.au.signOut(F.auth)}},
@@ -273,6 +277,9 @@ const F={mode:'firebase',shared:true,
  dmSub(k,cb,err){return F.fs.onSnapshot(F.fs.query(F.fs.collection(F.db,'dms',k,'msgs'),F.fs.orderBy('ts','desc'),F.fs.limit(60)),s=>cb(s.docs.map(d=>({...d.data(),id:d.id})).reverse()),err)},
  async dmSend(k,m){await F.fs.addDoc(F.fs.collection(F.db,'dms',k,'msgs'),m)},
  async dmDel(k,id){await F.fs.deleteDoc(F.fs.doc(F.db,'dms',k,'msgs',id))},
+  async tradeCreate(t){const r=await F.fs.addDoc(F.col('trades'),t);return r.id},
+  tradesSub(cb,err){return F.fs.onSnapshot(F.fs.query(F.col('trades'),F.fs.where('participants','array-contains',P.id)),s=>cb(s.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>b.ts-a.ts)),err)},
+  async tradeRespond(id,action){const r=await F.respondTrade({tradeId:id,action});return r.data},
  playerSub(id,cb){return F.fs.onSnapshot(F.pd(id),s=>{if(s.metadata.hasPendingWrites)return;cb(s.exists()?s.data():null)})},
  cfgSub(cb){return F.fs.onSnapshot(F.fs.doc(F.db,'config','main'),s=>cb(s.exists()?s.data():null))},
  async cfgSet(o){await F.fs.setDoc(F.fs.doc(F.db,'config','main'),o,{merge:true})},
@@ -366,7 +373,7 @@ function home(){const av=P.avatar&&EL[P.avatar],c=av?COL[RAR[av.r]]:'#4cff4c',b=
   <input class="pill" id="un" placeholder="Enter Username Here"><button class="pill" id="vs">View Stats</button><button class="pill" id="tr">Trade</button>
   <div class="biobox"><div class="bh">Bio</div>${P.bio?esc(P.bio):'<span style="opacity:.5">No bio yet — press Edit Bio to add your Discord, YouTube and more.</span>'}</div></div></div>`);
  $('#d').onclick=()=>{const left=P.last+864e5-Date.now();if(left>0)return toast(`Come back in ${Math.ceil(left/36e5)}h`);const g=DAILYAMT;P.last=Date.now();P.atoms+=g;persist();showReward(g);setBal();home()};
- $('#nw').onclick=showNews;$('#fr').onclick=()=>go('friends');$('#bi').onclick=editBio;if(isOwner())$('#ow').onclick=ownerPanel;$('#tr').onclick=()=>toast('Trading is not available yet');
+ $('#nw').onclick=showNews;$('#fr').onclick=()=>go('friends');$('#bi').onclick=editBio;if(isOwner())$('#ow').onclick=ownerPanel;$('#tr').onclick=()=>go('trades');
  $('#vs').onclick=async()=>{const n=$('#un').value.trim();if(!n)return;let x;try{x=await B.byName(n.toLowerCase())}catch(e){}
   if(!x)return errBox('User not found.');
   modal(`<h2>${esc(x.name)}</h2><div class="t">Role: ${esc(x.role)}<br>Atoms: ${fmt(x.atoms)}<br>Elements: ${Object.values(x.els||{}).reduce((a,b)=>a+b,0)}${x.bio?`<br><br>${esc(x.bio)}`:''}</div>${x.id!==P.id?'<button class="b" id="af">Add Friend</button>':''}<button class="b" id="ok">Okay</button>`,(m,c)=>{$('#ok',m).onclick=c;const a=$('#af',m);if(a)a.onclick=()=>{c();addFriend(x)}})}
@@ -410,6 +417,26 @@ function friends(){let dmPair=null,dmu=null;
  let fu=()=>{};try{fu=B.friendsSub(l=>{FRL=l;list();if(dmPair&&!FRL.some(f=>f.pair===dmPair&&f.status==='accepted'))closeDm()},()=>toast('Friends unavailable'))}catch(e){toast('Friends unavailable')}
  unsub=()=>{fu();dmu&&dmu()}}
 
+function trades(){
+ const owned=Object.keys(P.els||{}).filter(k=>P.els[k]>0&&EL[k]).sort((a,b)=>nm(a).localeCompare(nm(b)));
+ const opts=Object.keys(EL).sort((a,b)=>nm(a).localeCompare(nm(b))).map(k=>'<option value="'+esc(k)+'">'+esc(nm(k))+'</option>').join('');
+ shell('trades','<div class="tradewrap"><div class="title" style="font-size:2.8rem;text-align:center">Trading</div><div class="smallnote" style="text-align:center">Offers are checked again before they are accepted.</div>'+
+ '<div class="tradecard"><h2 style="margin:.1rem 0 .7rem;font-weight:400">Create an offer</h2><div class="tradegrid">'+
+ '<label>Player username<input id="tu" maxlength="16" placeholder="Username"></label><label>Offer atoms<input id="ta" type="number" min="0" step="1" value="0"></label><label>Request atoms<input id="trAtoms" type="number" min="0" step="1" value="0"></label>'+
+ '<label>Offer element<select id="te"><option value="">No element</option>'+owned.map(k=>'<option value="'+esc(k)+'">'+esc(nm(k))+' ×'+P.els[k]+'</option>').join('')+'</select></label><label>Offer quantity<input id="tq" type="number" min="0" step="1" value="0"></label>'+
+ '<label>Request element<select id="tw"><option value="">No element</option>'+opts+'</select></label><label>Request quantity<input id="twq" type="number" min="0" step="1" value="0"></label></div><div class="tradeactions"><button class="btn" id="tsend">Send offer</button></div></div>'+
+ '<h2 style="font-weight:400">Your offers</h2><div id="tradeList"><div class="tradecard">Loading offers…</div></div></div>');
+ $('#tsend').onclick=async()=>{const target=$('#tu').value.trim();if(!target)return toast('Enter a username');let to;try{to=await B.byName(target.toLowerCase())}catch(e){}if(!to)return toast('Player not found');if(to.id===P.id)return toast('You cannot trade with yourself');
+ const atoms=Number($('#ta').value),wantAtoms=Number($('#trAtoms').value),ek=$('#te').value,wk=$('#tw').value,eq=Number($('#tq').value),wq=Number($('#twq').value);
+ if(![atoms,wantAtoms,eq,wq].every(Number.isSafeInteger)||[atoms,wantAtoms,eq,wq].some(v=>v<0))return toast('Use whole numbers only');
+ if(atoms===0&&eq===0&&wantAtoms===0&&wq===0)return toast('Add something to the offer and request');if(atoms>P.atoms)return toast('You do not have enough atoms');if(ek&&eq>(P.els[ek]||0))return toast('You do not have enough of that element');if((!ek&&eq>0)||(!wk&&wq>0))return toast('Choose an element for the quantity');
+ const offer={atoms:atoms,els:ek&&eq?{[ek]:eq}:{}},want={atoms:wantAtoms,els:wk&&wq?{[wk]:wq}:{}};
+ $('#tsend').disabled=true;try{await B.tradeCreate({from:P.id,to:to.id,fromName:P.name,toName:to.name,participants:[P.id,to.id],offer:offer,want:want,status:'pending',ts:Date.now()});toast('Trade offer sent');$('#tu').value=''}catch(e){toast(B.mode==='firebase'?'Could not send offer. Cloud trade rules may not be deployed.':'Could not send offer')}finally{$('#tsend').disabled=false}};
+ let tradeUnsub=()=>{};const drawTrades=list=>{const el=$('#tradeList');if(!el)return;const pending=list.filter(t=>t.status==='pending'),history=list.filter(t=>t.status!=='pending').slice(0,8);const line=pack=>{const bits=[];if(pack&&pack.atoms)bits.push(fmt(pack.atoms)+' atoms');for(const [k,v] of Object.entries((pack&&pack.els)||{}))bits.push(v+' × '+nm(k));return bits.join(', ')||'Nothing'};
+ el.innerHTML=(pending.length?pending.map(t=>{const incoming=t.to===P.id;return '<div class="tradecard"><div><b>'+(incoming?'From ':'To ')+esc(incoming?t.fromName:t.toName)+'</b> <span class="smallnote">· '+new Date(t.ts).toLocaleString()+'</span></div><div style="margin:.4rem 0">'+(incoming?'They offer: ':'You offer: ')+esc(line(incoming?t.offer:t.want))+'</div><div>'+(incoming?'You give: ':'They give: ')+esc(line(incoming?t.want:t.offer))+'</div>'+(incoming?'<div class="tradeactions"><button class="mini" data-accept="'+esc(t.id)+'">Accept</button><button class="mini" data-decline="'+esc(t.id)+'">Decline</button></div>':'<div class="smallnote">Waiting for their response</div>')+'</div>'}).join(''):'<div class="tradecard">No pending offers.</div>')+(history.length?'<h3 style="font-weight:400">Recent history</h3>'+history.map(t=>'<div class="tradecard"><b>'+esc(t.fromName)+' ↔ '+esc(t.toName)+'</b><div class="smallnote">'+esc(t.status)+' · '+new Date(t.ts).toLocaleString()+'</div></div>').join(''):'')};
+ $('#tradeList').onclick=async e=>{const a=e.target.closest('[data-accept]'),d=e.target.closest('[data-decline]'),b=a||d;if(!b)return;b.disabled=true;try{await B.tradeRespond(b.dataset.accept||b.dataset.decline,a?'accept':'decline');if(a){try{const fresh=await B.get(P.id);if(fresh)Object.assign(P,fresh)}catch(x){}setBal();toast('Trade completed')}else toast('Trade declined')}catch(x){toast(B.mode==='firebase'?'Trade response failed. The respondToTrade Cloud Function must be deployed.':(x.message||'Trade failed'))}finally{b.disabled=false}};
+ try{tradeUnsub=B.tradesSub(drawTrades,()=>toast('Could not load trades'))}catch(e){toast('Could not load trades')}unsub=()=>tradeUnsub();
+}
 function settings(){shell('settings',`<div class="center"><div class="title" style="font-size:3rem">Settings</div><div class="tag">Signed in as ${esc(P.name)}</div>
  <button class="btn" id="cp">Change password</button><button class="btn" id="lo">Log out</button><button class="btn" id="de" style="background:#e55;color:#fff;filter:none">Delete account</button></div>`);
  $('#lo').onclick=logout;$('#cp').onclick=changePw;$('#de').onclick=()=>modal('<h2>Delete your account?</h2><div class="t">This permanently removes your atoms and elements.</div><div class="rw"><button class="b" id="y">Yes</button><button class="b" id="n">No</button></div>',(m,c)=>{
@@ -463,7 +490,7 @@ function sell(){const k=sel,max=P.els[k];
   $('#n',m).onclick=close;$('#y',m).onclick=()=>{const n=+q.value;if(!(n>0))return;P.els[k]-=n;P.atoms+=n*EL[k].price;if(!P.els[k])delete P.els[k];persist();close();toast(`Sold ${n} ${nm(k)}`);elements();setBal()}})}
 
 /* ===================== ROUTER / BOOT ===================== */
-const PAGES={'':landing,login:()=>authPage(false),register:()=>authPage(true),home,leaders,chat,friends,crates,elements,settings};
+const PAGES={'':landing,login:()=>authPage(false),register:()=>authPage(true),home,leaders,chat,friends,crates,elements,settings,trades};
 function render(){let r=route in PAGES?route:'';if(P&&(r===''||r==='login'||r==='register'))r='home';if(!P&&r!==''&&r!=='login'&&r!=='register')r='';route=r;if(P){ensureOwner();startLive()}else stopLive();PAGES[r]()}
 console.log('%c%s','color: white; font-size: 100px;text-shadow: 0px 0px 20px black;','Hold Up!');
 console.log('%c%s','color: white; font-size: 25px;text-shadow: 0px 0px 5px red;',"If someone told you to copy/paste something here you have an 11/10 chance you're being scammed.");
