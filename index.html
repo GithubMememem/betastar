@@ -443,8 +443,8 @@ function settings(){shell('settings',`<div class="center"><div class="title" sty
   $('#n',m).onclick=c;$('#y',m).onclick=async()=>{c();try{await B.del(P.id)}catch(e){}P=null;go('')}})}
 
 function crates(){
- shell('crates',`<div class="crates">${CRATES.map((c,i)=>`<div class="crate${c.name==='Spungle'?' sol':''}" style="--c:${c.color}" data-i="${i}"><div class="nm">${c.name} Crate</div><div class="ct" style="background:${CT[c.name]}${CT[c.name].startsWith('url')?' center/cover':''}"></div><div class="pr">${fmt(c.price)} ${ATOM}</div></div>`).join('')}</div>`);
- document.querySelectorAll('.crate').forEach(e=>e.onclick=()=>buy(CRATES[e.dataset.i]))}
+ shell('crates',`<div class="qolrow"><input class="fld" id="crateSearch" placeholder="Search crates…" aria-label="Search crates"></div><div class="crates">${CRATES.map((c,i)=>`<div class="crate${c.name==='Spungle'?' sol':''}" style="--c:${c.color}" data-i="${i}" data-name="${c.name.toLowerCase()}"><div class="nm">${c.name} Crate</div><div class="ct" style="background:${CT[c.name]}${CT[c.name].startsWith('url')?' center/cover':''}"></div><div class="pr">${fmt(c.price)} ${ATOM}</div></div>`).join('')}</div>`);
+ const tiles=[...document.querySelectorAll('.crate')];$('#crateSearch').oninput=()=>{const q=$('#crateSearch').value.trim().toLowerCase();tiles.forEach(e=>e.style.display=e.dataset.name.includes(q)?'':'none')};tiles.forEach(e=>e.onclick=()=>buy(CRATES[e.dataset.i]))}
 const wsum=c=>c.items.reduce((a,x)=>a+x.w,0);
 const RCW={Common:'#555',Uncommon:'#2e9a1b',Rare:'#2a2aff',Epic:'#d00000',Legendary:'#ff8c00',Fabled:'#0c7500',Perfect:'#c9a800',Mythical:'#a335ee',Divine:'#d14fd1'};
 function rates(c){const t=wsum(c),pc=v=>v<.01?(+v.toFixed(6))+'%':v<1?v.toFixed(3)+'%':v.toFixed(2)+'%',rows=c.items.slice().sort((a,b)=>a.i-b.i||b.w-a.w);
