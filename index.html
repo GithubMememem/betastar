@@ -239,22 +239,26 @@ input.loginButton:active{transform:translateX(-50%) translateY(1px);box-shadow:0
 @media(prefers-reduced-motion:reduce){.rainbow,.float{animation:none!important}}
 
 
-/* Clans page: restrained, game-native styling */
-.clanPage{width:min(70rem,96vw);margin:1.8rem auto 3rem;padding:0 1rem}
-.clanHeading{text-align:center;margin-bottom:1.1rem}.clanHeading p,.myClan p{opacity:.68;margin:.25rem 0 .7rem;font-size:.95rem}
-.myClan{width:min(42rem,100%);margin:0 auto 1rem;padding:.8rem 1rem;border:1px solid #343a3f;border-radius:.45rem;background:#0b0d0f}
-.myClan.emptyClan{text-align:center;color:#aeb5b9}.eyebrow{font-size:.68rem;letter-spacing:.12em;opacity:.6}.myClanTitle{font-size:1.5rem;margin:.2rem 0}
-.clanActions{display:flex;gap:.6rem;justify-content:center;align-items:center;flex-wrap:wrap;margin:1rem auto}.clanActions .fld{width:min(24rem,100%)}.clanCreate{min-width:0;font-size:1rem;padding:.35rem 1rem}
-.clanGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(18rem,100%),1fr));gap:.8rem}
-.clanCard{border:1px solid #292d31;border-radius:.5rem;overflow:hidden;background:#090a0b;transition:border-color .18s}.clanCard:hover{border-color:#646d74}
-.clanCover{height:5.5rem;background:linear-gradient(110deg,color-mix(in srgb,var(--clan) 24%,#080808),#111);display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid #282c30}
-.clanMark{font-size:2.6rem;color:var(--clan);font-weight:bold;opacity:.9}.clanMembers{position:absolute;right:.55rem;bottom:.45rem;font-size:.7rem;color:#c4c8cb}
-.clanBody{padding:.75rem .85rem}.clanName{font-size:1.25rem}.clanLevel{font-size:.72rem;color:#aeb5b9;margin-top:.1rem}.clanBody p{font-size:.82rem;line-height:1.4;min-height:2.2rem;color:#c3c7ca;margin:.5rem 0}
-.clanFoot{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:.7rem;color:#aeb5b9;border-top:1px solid #25282b;padding-top:.55rem}.clanFoot .mini:disabled{opacity:.45;cursor:default}
-.clanNote{text-align:center;color:#737a80;font-size:.7rem;margin-top:1rem}
-.progressCard{box-shadow:none;border:1px solid #282b2e;background:#080909;border-radius:.4rem}
-.xpTrack{background:#282b2e;border-radius:0;height:.45rem}.xpFill{background:#c9d1d6;box-shadow:none}
-.ach{border-radius:.25rem!important;box-shadow:none!important;background:#151719!important}.ach.done{background:#242a2e!important;border-color:#66727a!important}
+/* Reveal: centered original-style pack result with a proper confetti layer */
+.reveal{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.76);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:1rem;padding:2rem 1rem 2.2rem;animation:fi .35s ease both;transition:opacity .65s ease}
+.reveal .rn{font-size:clamp(2rem,4vw,4rem);line-height:1.1;text-align:center;text-shadow:0 0 12px #fff,0 2px 3px #000;animation:revealName .65s cubic-bezier(.2,.8,.2,1) both}
+.revealCenter{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:min(92vw,25rem);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;text-align:center}
+.reveal .rt{width:clamp(10rem,15vw,13rem);aspect-ratio:1;border:3px solid #fff;border-radius:.35rem;background:#000 center/contain no-repeat;box-shadow:0 0 24px rgba(255,255,255,.38);animation:revealTile .75s cubic-bezier(.16,1,.3,1) .12s both}
+.reveal .rr{font-size:clamp(2.6rem,5vw,4rem);line-height:1.05;margin-top:.1rem;animation:revealRarity .55s ease .3s both}
+.reveal .chance{font-size:1rem;line-height:1.35;color:#ddd;text-shadow:0 1px 2px #000}
+.revealHint{position:absolute;bottom:2rem;left:0;right:0;text-align:center;color:#ddd;font-size:1rem}
+.nw{position:absolute;top:-.9rem;right:-1.4rem;color:#ffe500;font-size:1rem;transform:rotate(12deg);text-shadow:0 0 8px #000}
+#pc{position:fixed;inset:0;width:100%;height:100%;z-index:71;pointer-events:none;transition:opacity .5s}
+@keyframes revealName{from{opacity:0;transform:translateY(-14px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes revealTile{0%{opacity:0;transform:scale(.42) rotate(-5deg);filter:brightness(2)}65%{opacity:1;transform:scale(1.06) rotate(1deg)}100%{opacity:1;transform:scale(1) rotate(0);filter:none}}
+@keyframes revealRarity{from{opacity:0;transform:scale(.72)}to{opacity:1;transform:scale(1)}}
+@media(max-width:600px){.reveal{padding-top:12vh}.revealCenter{top:48%}.reveal .rn{max-width:95vw}.revealHint{bottom:1.2rem}}
+/* Keep progression close to the site's plain, compact UI rather than dashboard cards */
+.progressCard{background:transparent;border:0;border-top:1px solid #303438;border-radius:0;padding:.75rem 0;width:min(28rem,92vw);margin:1rem auto;text-align:left;box-shadow:none}
+.progTop{font-size:.98rem;font-weight:700}.xpTrack{height:.48rem;background:#292d30;border-radius:2px;overflow:hidden;margin:.5rem 0}.xpFill{height:100%;background:#9cc7de;box-shadow:none;transition:width .35s}
+.progMeta{font-size:.72rem;color:#aeb5b9;opacity:1}.quest{font-size:.82rem;padding:.38rem 0;border-top:1px solid #25292c}.quest strong{font-weight:700;color:#c9d1d6}
+.achrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 .9rem;margin-top:.35rem}.ach,.ach.done{padding:.45rem 0;border:0;border-top:1px solid #25292c;border-radius:0;background:transparent;box-shadow:none}
+.ach::after{font-size:.68rem;color:#777}.ach.done::after{color:#9cc7de}
 </style>
 
 </head>
@@ -348,7 +352,7 @@ const ICONS={home:'<path d="M256 40L16 250h72v212h124V330h88v132h124V250h72z"/>'
  chat:'<path fill-rule="evenodd" d="M256 48C130 48 28 126 28 224c0 52 30 98 78 128-4 34-20 70-46 100 56-8 98-32 126-54 22 6 44 8 70 8 126 0 228-78 228-176S382 48 256 48zM144 200a28 28 0 100 56 28 28 0 000-56zm112 0a28 28 0 100 56 28 28 0 000-56zm112 0a28 28 0 100 56 28 28 0 000-56z"/>',
  crates:'<path fill-rule="evenodd" d="M24 56h464v112H24zM56 192h400v272H56zM196 252h120v44H196z"/>',
  elements:'<g>'+cube(256,128,112)+cube(140,330,112)+cube(372,330,112)+'</g>',
- clans:'<path d="M256 38l68 38 0 76-68 38-68-38V76zM105 235l68 38v76l-68 38-68-38v-76zM407 235l68 38v76l-68 38-68-38v-76zM256 240l68 38v76l-68 38-68-38v-76z"/>',
+
  settings:'<path fill-rule="evenodd" d="M208 24h96l14 62 36 15 54-33 68 68-33 54 15 36 62 14v96l-62 14-15 36 33 54-68 68-54-33-36 15-14 62h-96l-14-62-36-15-54 33-68-68 33-54-15-36-62-14v-96l62-14 15-36-33-54 68-68 54 33 36-15zM256 176a80 80 0 100 160 80 80 0 000-160z"/>',
  trades:'<path d="M56 132h292l-50-50 40-40 118 118-118 118-40-40 50-50H56zM456 380H164l50 50-40 40L56 352l118-118 40 40-50 50h292z"/>',
  logout:'<path d="M40 48h200v56H96v304h144v56H40zM300 130l170 126-170 126v-88H170v-76h130z"/>'};
@@ -451,7 +455,7 @@ function modal(html,mount,cls=''){const m=document.createElement('div');m.classN
 const info=(t,msg,cls='')=>modal(`<h2>${esc(t)}</h2><div class="t">${esc(msg)}</div><button class="b" id="ok">Okay</button>`,(m,c)=>{$('#ok',m).onclick=c;$('#ok',m).focus()},cls);
 const errBox=m=>info('Error',m,'err big');
 function shell(page,inner){
- const nav=P?`<nav>${['home','leaders','chat','crates','elements','clans','trades','settings','logout'].map(k=>svg(k).replace('<svg ',`<svg class="${k===page?'on':''}" `)).join('')}</nav>`:'';
+ const nav=P?`<nav>${['home','leaders','chat','crates','elements','trades','settings','logout'].map(k=>svg(k).replace('<svg ',`<svg class="${k===page?'on':''}" `)).join('')}</nav>`:'';
  $('#app').innerHTML=`<div><header><span class="logo" data-go="${P?'home':''}">Betastar</span>${nav}</header>${warnBar()}${inner}</div>${P?`<div class="bal"><span id="bal">${fmt(P.atoms)}</span>${ATOM}</div>`:''}`;
  $('#app').querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>e.dataset.go==='logout'?logout():go(e.dataset.go));shown=P?P.atoms:0}
 let shown=0,tw=0;
@@ -623,17 +627,21 @@ function buy(c){if(crateOpening)return;modal(`<h2>Purchase the ${c.name} Crate f
    if(instantOpenEnabled()){reveal(it,isNew,chance,P.els[it.n],true)}else{showLoading();await sleep(1700);hideLoading();reveal(it,isNew,chance,P.els[it.n],false)}
   }catch(e){hideLoading();toast('Could not open crate. Try again.')}finally{crateOpening=false}
  }})}
-function reveal(it,isNew,chance=it.w,owned=1,instant=false){const col=COL[RAR[it.i]],d=document.createElement('div');d.className='reveal';d.style.removeProperty('--rarity-color');
- d.innerHTML=`<div class="rn">${nm(it.n)}</div><div class="rt" style="background-image:${tex(it.n)}">${isNew?'<span class="nw">NEW!</span>':''}</div><div class="rr" style="color:${col};text-shadow:0 0 22px ${col}">${RAR[it.i]}</div><div class="chance">Pull chance: ${(chance<.01?chance.toFixed(6):chance<1?chance.toFixed(3):chance.toFixed(2))}% · ${isNew?'First discovery':'Owned: '+fmt(owned)}</div><div class="chance">Click anywhere to close</div>`;
+function reveal(it,isNew,chance=it.w,owned=1,instant=false){
+ const col=COL[RAR[it.i]],d=document.createElement('div');d.className='reveal';
+ d.innerHTML=`<div class="rn">${nm(it.n)}</div><div class="revealCenter"><div class="rt" style="background-image:${tex(it.n)}">${isNew?'<span class="nw">NEW!</span>':''}</div><div class="rr" style="color:${col};text-shadow:0 0 22px ${col}">${RAR[it.i]}</div><div class="chance">Pull chance: ${(chance<.01?chance.toFixed(6):chance<1?chance.toFixed(3):chance.toFixed(2))}%</div><div class="chance">${isNew?'First discovery':'Owned: '+fmt(owned)}</div></div><div class="revealHint">Click anywhere to close</div>`;
  const cv=document.createElement('canvas');cv.id='pc';cv.width=innerWidth;cv.height=innerHeight;document.body.append(d,cv);
- const g=cv.getContext('2d'),mk=(burst)=>{const a=Math.random()*6.28,s=burst?2+Math.random()*(5+it.i):0;return{x:burst?cv.width/2:Math.random()*cv.width,y:burst?cv.height/2:-10,vx:Math.cos(a)*s,vy:burst?Math.sin(a)*s-1.5:.5+Math.random()*.9,r:Math.random()*6,w:2+Math.random()*2.5,h:4+Math.random()*6,life:0,max:230+Math.random()*120}};
- let Q=Array.from({length:instant?0:80+it.i*30},()=>mk(true)),t0=performance.now();
- (function f(t){if(!d.isConnected)return cv.remove();g.clearRect(0,0,cv.width,cv.height);g.fillStyle=col;const el=t-t0;
-  if(!instant&&el<3400)Q.push(mk(false));
-  Q=Q.filter(p=>{p.life++;p.x+=p.vx;p.y+=p.vy;p.vy+=.02;p.vx*=.99;p.r+=.1;g.globalAlpha=Math.max(0,1-p.life/p.max);g.save();g.translate(p.x,p.y);g.rotate(p.r);g.fillRect(-p.w/2,-p.h/2,p.w,p.h);g.restore();return p.life<p.max});
-  requestAnimationFrame(f)})(t0);
- const end=()=>{d.classList.add('out');setTimeout(()=>d.remove(),850)};d.onclick=end;setTimeout(()=>d.isConnected&&end(),instant?2800:6200)}
-
+ const g=cv.getContext('2d'),colors=['#f7d154','#f26b5b','#65c8ef','#8dd58a','#c49aff','#ffffff','#f49ac2'];
+ const burst=()=>Array.from({length:instant?0:Math.min(180,90+it.i*18)},()=>{const a=Math.random()*Math.PI*2,v=3+Math.random()*8;return{x:cv.width/2+(Math.random()-.5)*50,y:cv.height*.48+(Math.random()-.5)*35,vx:Math.cos(a)*v,vy:Math.sin(a)*v-3-Math.random()*3,w:5+Math.random()*7,h:7+Math.random()*10,rot:Math.random()*6,spin:(Math.random()-.5)*.22,life:0,max:100+Math.random()*100,color:colors[Math.floor(Math.random()*colors.length)]}});
+ let particles=burst(),last=0,frame;
+ function draw(t){if(!d.isConnected){cancelAnimationFrame(frame);cv.remove();return}const dt=Math.min(2,(t-last)/16.67||1);last=t;g.clearRect(0,0,cv.width,cv.height);
+  if(!instant&&t%180<18&&particles.length<150)particles.push({x:Math.random()*cv.width,y:-15,vx:(Math.random()-.5)*1.8,vy:1+Math.random()*2,w:5+Math.random()*6,h:7+Math.random()*9,rot:Math.random()*6,spin:(Math.random()-.5)*.08,life:0,max:180+Math.random()*100,color:colors[Math.floor(Math.random()*colors.length)]});
+  particles=particles.filter(p=>{p.life+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.12*dt;p.vx*=.995;p.rot+=p.spin*dt;const alpha=Math.min(1,(p.max-p.life)/28);if(alpha<=0)return false;g.save();g.globalAlpha=alpha;g.translate(p.x,p.y);g.rotate(p.rot);g.fillStyle=p.color;g.fillRect(-p.w/2,-p.h/2,p.w,p.h);g.restore();return p.life<p.max&&p.y<cv.height+30});
+  frame=requestAnimationFrame(draw)}
+ frame=requestAnimationFrame(draw);
+ const end=()=>{if(!d.isConnected)return;d.classList.add('out');cv.style.opacity='0';setTimeout(()=>{d.remove();cv.remove();cancelAnimationFrame(frame)},650)};
+ d.onclick=end;setTimeout(()=>d.isConnected&&end(),instant?2800:6200)
+}
 
 let sel=null,view='own';
 function elements(){const own=Object.keys(P.els).filter(k=>EL[k]&&P.els[k]>0).sort((a,b)=>EL[b].r-EL[a].r||a.localeCompare(b));
@@ -661,33 +669,8 @@ function sell(){const k=sel,max=P.els[k];
 
 /* ===================== ROUTER / BOOT ===================== */
 
-/* Clans: lightweight local community feature, persisted with the existing player save. */
-function clanLevel(exp){let level=0,left=Math.max(0,Number(exp)||0);for(let guard=0;guard<1000;guard++){const need=Math.max(100,Math.round(100*Math.pow(level+1,1.35)));if(left<need)break;left-=need;level++}return{level,left,need:Math.max(100,Math.round(100*Math.pow(level+1,1.35)))}}
-function clans(){
- if(!P.clans||typeof P.clans!=='object')P.clans={joined:null,created:[]};
- if(!Array.isArray(P.clans.created))P.clans.created=[];
- if(!Array.isArray(P.clans.directory))P.clans.directory=[];
- const directory=P.clans.directory;
- const defaults=[
-  {id:'orbit',name:'Orbit',description:'Collect, trade, and help each other complete the set.',color:'#9cc7de',safe:true,owner:'Betastar',members:12,exp:780},
-  {id:'afterhours',name:'Afterhours',description:'For late-night crate openings and rare pulls.',color:'#a78bfa',safe:false,owner:'Nova',members:8,exp:420},
-  {id:'periodic',name:'Periodic',description:'A chill crew for element collectors.',color:'#9ba5ad',safe:true,owner:'Atom',members:21,exp:1680}
- ];
- const all=[...defaults,...directory.filter(c=>!defaults.some(d=>d.id===c.id)),...P.clans.created.filter(c=>!directory.some(d=>d.id===c.id)&&!defaults.some(d=>d.id===c.id))];
- const joined=all.find(c=>c.id===P.clans.joined)||null;
- const card=c=>{const lv=clanLevel(c.exp);return `<article class="clanCard"><div class="clanCover" style="--clan:${esc(c.color)}"><span class="clanMark">${esc(c.name.slice(0,1).toUpperCase())}</span><span class="clanMembers">${c.members} members</span></div><div class="clanBody"><div class="clanName" style="color:${esc(c.color)}">${c.safe?'◆ ':''}${esc(c.name)}</div><div class="clanLevel">Level ${lv.level} · ${fmt(c.exp)} XP</div><p>${esc(c.description)}</p><div class="clanFoot"><span>Owner: ${esc(c.owner)}</span><button class="mini" data-join="${esc(c.id)}" ${joined?'disabled':''}>${joined?(joined.id===c.id?'Joined':'In a clan'):'Join'}</button></div></div></article>`};
- shell('clans',`<section class="clanPage"><div class="clanHeading"><div class="title" style="font-size:2.7rem">Clans</div><p>Find your people. Build a collection together.</p></div>
- ${joined?`<div class="myClan"><span class="eyebrow">YOUR CLAN</span><div class="myClanTitle">${esc(joined.name)}</div><p>${esc(joined.description)}</p><button class="mini" id="leaveClan">Leave clan</button></div>`:'<div class="myClan emptyClan">You are not in a clan yet.</div>'}
- <div class="clanActions"><input class="fld" id="clanSearch" placeholder="Search clans…" aria-label="Search clans"><button class="btn clanCreate" id="createClan">Create clan</button></div>
- <div class="clanGrid" id="clanGrid">${all.map(card).join('')}</div><p class="clanNote">Clans are currently saved to this browser profile. Online cross-player clan syncing is not enabled.</p></section>`);
- const grid=$('#clanGrid');const search=$('#clanSearch');
- search.oninput=()=>{const q=search.value.trim().toLowerCase();grid.querySelectorAll('.clanCard').forEach(el=>el.style.display=el.textContent.toLowerCase().includes(q)?'':'none')};
- grid.querySelectorAll('[data-join]').forEach(b=>b.onclick=()=>{if(P.clans.joined)return toast('Leave your current clan first');const c=all.find(x=>x.id===b.dataset.join);if(!c)return;P.clans.joined=c.id;persist();clans();toast('Joined '+c.name)});
- const leave=$('#leaveClan');if(leave)leave.onclick=()=>{P.clans.joined=null;persist();clans();toast('You left the clan')};
- $('#createClan').onclick=()=>modal('<h2>Create a clan</h2><input class="fld" id="newClanName" maxlength="20" placeholder="Clan name"><input class="fld" id="newClanDesc" maxlength="120" placeholder="Short description"><div class="rw"><button class="b" id="saveClan">Create</button><button class="b" id="cancelClan">Cancel</button></div>',(m,close)=>{$('#cancelClan',m).onclick=close;$('#saveClan',m).onclick=()=>{const name=$('#newClanName',m).value.trim(),description=$('#newClanDesc',m).value.trim();if(name.length<3)return toast('Clan name must be at least 3 characters');if(all.some(c=>c.name.toLowerCase()===name.toLowerCase()))return toast('That clan name is taken');const c={id:'user-'+Date.now().toString(36),name,description:description||'A new crew of collectors.',color:'#9cc7de',safe:true,owner:P.name,members:1,exp:0};P.clans.created.push(c);P.clans.joined=c.id;persist();close();clans();toast('Clan created') }});
-}
 
-const PAGES={'':landing,login:()=>authPage(false),register:()=>authPage(true),home,leaders,chat,friends,crates,elements,clans,settings,trades};
+const PAGES={'':landing,login:()=>authPage(false),register:()=>authPage(true),home,leaders,chat,friends,crates,elements,settings,trades};
 function render(){let r=route in PAGES?route:'';if(P&&(r===''||r==='login'||r==='register'))r='home';if(!P&&r!==''&&r!=='login'&&r!=='register')r='';route=r;if(P){ensureOwner();startLive()}else stopLive();PAGES[r]()}
 console.log('%c%s','color: white; font-size: 100px;text-shadow: 0px 0px 20px black;','Hold Up!');
 console.log('%c%s','color: white; font-size: 25px;text-shadow: 0px 0px 5px red;',"If someone told you to copy/paste something here you have an 11/10 chance you're being scammed.");
