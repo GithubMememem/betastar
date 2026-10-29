@@ -214,6 +214,30 @@ input.loginButton:active{transform:translateX(-50%) translateY(1px);box-shadow:0
   .rainbow,.float{animation:none}
 }
 
+
+/* Blacket-inspired visual utilities adapted for Betastar Reloaded */
+.rainbow{background-image:linear-gradient(100deg,#ff5555,#ffcf55,#71ef91,#67d9ff,#b68cff,#ff7ab7);background-size:250% 100%;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:textShine 3s linear infinite;text-shadow:0 0 .052vw rgba(0,0,0,.2)}
+@keyframes textShine{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+.float{animation:betastarFloat 2.5s ease-in-out infinite}
+@keyframes betastarFloat{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
+.styles__blooketText___1pMBG-camelCase{font-size:2.083vw;font-family:'Jua',sans-serif;color:#fff;filter:drop-shadow(0 0 .26vw #000);margin-bottom:1.042vw;text-align:center;text-decoration:none}
+.bsButton3d{position:relative;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:filter .25s,transform .25s;box-shadow:0 4px #3c5260}
+.bsButton3d:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 6px #3c5260}
+.bsButton3d:active{transform:translateY(1px);box-shadow:0 2px #3c5260}
+.crateTools{display:flex;align-items:center;justify-content:center;gap:.65rem;flex-wrap:wrap;margin:.5rem auto 1rem}
+.instantToggle{border:1px solid #9cc7de;background:#101820;color:#fff;border-radius:.5rem;padding:.4rem .75rem;font:inherit;cursor:pointer;transition:.2s}
+.instantToggle[aria-pressed="true"]{background:#9cc7de;color:#071018;box-shadow:0 0 14px #9cc7de66}
+.instantToggle:hover{filter:brightness(1.15)}
+.reveal{background:radial-gradient(circle at 50% 45%,#202b35 0%,rgba(0,0,0,.96) 70%)}
+.reveal .rn{max-width:92vw;text-align:center;font-size:clamp(2rem,6vw,4rem)}
+.reveal .chance{font-size:1rem;opacity:.8;text-align:center;margin-top:.35rem}
+.reveal .dupe{font-size:.9rem;opacity:.75;text-align:center;margin-top:.25rem}
+.reveal.rarity-4,.reveal.rarity-5{background:radial-gradient(circle at 50% 45%,#3c260e 0%,rgba(0,0,0,.97) 72%)}
+.reveal.rarity-6,.reveal.rarity-7{background:radial-gradient(circle at 50% 45%,#321344 0%,rgba(0,0,0,.97) 72%)}
+.reveal.rarity-8{background:radial-gradient(circle at 50% 45%,#4a153d 0%,rgba(0,0,0,.97) 72%)}
+.reveal .rt{border-color:var(--rarity-color,#fff);box-shadow:0 0 25px color-mix(in srgb,var(--rarity-color,#fff) 65%,transparent)}
+@media(prefers-reduced-motion:reduce){.rainbow,.float{animation:none!important}}
+
 </style>
 
 </head>
@@ -556,29 +580,42 @@ function settings(){shell('settings',`<div class="center"><div class="title" sty
  $('#de').onclick=()=>modal('<h2>Delete your account?</h2><div class="t">This permanently removes your atoms and elements.</div><div class="rw"><button class="b" id="y">Yes</button><button class="b" id="n">No</button></div>',(m,c)=>{
   $('#n',m).onclick=c;$('#y',m).onclick=async()=>{c();try{await B.del(P.id)}catch(e){}P=null;go('')}})}
 
+function instantOpenEnabled(){try{return localStorage.getItem('betastarInstantOpen')==='true'}catch(e){return false}}
+function setInstantOpen(on){try{localStorage.setItem('betastarInstantOpen',on?'true':'false')}catch(e){}}
 function crates(){
- shell('crates',`<div class="qolrow"><input class="fld" id="crateSearch" placeholder="Search crates…" aria-label="Search crates"></div><div class="crates">${CRATES.map((c,i)=>`<div class="crate${c.name==='Spungle'?' sol':''}" style="--c:${c.color}" data-i="${i}" data-name="${c.name.toLowerCase()}"><div class="nm">${c.name} Crate</div><div class="ct" style="background:${CT[c.name]}${CT[c.name].startsWith('url')?' center/cover':''}"></div><div class="pr">${fmt(c.price)} ${ATOM}</div></div>`).join('')}</div>`);
+ shell('crates',`<div class="crateTools"><input class="fld" id="crateSearch" placeholder="Search crates…" aria-label="Search crates"><button class="instantToggle bsButton3d" id="instantToggle" aria-pressed="${instantOpenEnabled()}" type="button">Instant Open: ${instantOpenEnabled()?'On':'Off'}</button></div><div class="crates">${CRATES.map((c,i)=>`<div class="crate${c.name==='Spungle'?' sol':''}" style="--c:${c.color}" data-i="${i}" data-name="${c.name.toLowerCase()}"><div class="nm">${c.name} Crate</div><div class="ct" style="background:${CT[c.name]}${CT[c.name].startsWith('url')?' center/cover':''}"></div><div class="pr">${fmt(c.price)} ${ATOM}</div></div>`).join('')}</div>`);
+ const toggle=$('#instantToggle');toggle.onclick=()=>{const on=!instantOpenEnabled();setInstantOpen(on);toggle.textContent='Instant Open: '+(on?'On':'Off');toggle.setAttribute('aria-pressed',String(on));toast('Instant Open '+(on?'enabled':'disabled'))};
  const tiles=[...document.querySelectorAll('.crate')];$('#crateSearch').oninput=()=>{const q=$('#crateSearch').value.trim().toLowerCase();tiles.forEach(e=>e.style.display=e.dataset.name.includes(q)?'':'none')};tiles.forEach(e=>e.onclick=()=>buy(CRATES[e.dataset.i]))}
 const wsum=c=>c.items.reduce((a,x)=>a+x.w,0);
 const RCW={Common:'#555',Uncommon:'#2e9a1b',Rare:'#2a2aff',Epic:'#d00000',Legendary:'#ff8c00',Fabled:'#0c7500',Perfect:'#c9a800',Mythical:'#a335ee',Divine:'#d14fd1'};
 function rates(c){const t=wsum(c),pc=v=>v<.01?(+v.toFixed(6))+'%':v<1?v.toFixed(3)+'%':v.toFixed(2)+'%',rows=c.items.slice().sort((a,b)=>a.i-b.i||b.w-a.w);
  modal(`<h2 style="color:#444;text-shadow:none">${c.name} Crate Rates</h2><div class="rls">${rows.map(x=>`<div class="rr2"><b style="color:${RCW[RAR[x.i]]}">${esc(EL[x.n].name)}</b><span style="color:${RCW[RAR[x.i]]}">${RAR[x.i]}</span><i>${pc(x.w/t*100)}</i></div>`).join('')}</div><button class="b" id="ok">Okay</button>`,(m,k)=>$('#ok',m).onclick=k,'wide')}
 function roll(c){let r=Math.random()*wsum(c);for(const x of c.items){if((r-=x.w)<=0)return x}return c.items[0]}
-function buy(c){modal(`<h2>Purchase the ${c.name} Crate for ${fmt(c.price)} atoms?</h2><button class="b" id="rt">Rates</button><div class="rw"><button class="b" id="y">Yes</button><button class="b" id="n">No</button></div>`,(m,close)=>{
+let crateOpening=false;
+function buy(c){if(crateOpening)return;modal(`<h2>Purchase the ${c.name} Crate for ${fmt(c.price)} atoms?</h2><button class="b" id="rt">Rates</button><div class="rw"><button class="b" id="y">Yes</button><button class="b" id="n">No</button></div>`,(m,close)=>{
  $('#rt',m).onclick=()=>rates(c);$('#n',m).onclick=close;
- $('#y',m).onclick=async()=>{close();if(P.atoms<c.price)return toast('Not enough atoms');
-  P.atoms-=c.price;const it=roll(c),isNew=!P.els[it.n];P.els[it.n]=(P.els[it.n]||0)+1;ensureProgress();addXP(10+Math.max(0,it.i)*2+(isNew?20:0));missionProgress('open',isNew);persist();setBal();
-  showLoading();await sleep(1700);hideLoading();reveal(it,isNew)}})}
-function reveal(it,isNew){const col=COL[RAR[it.i]],d=document.createElement('div');d.className='reveal';
- d.innerHTML=`<div class="rn">${nm(it.n)}</div><div class="rt" style="background-image:${tex(it.n)}">${isNew?'<span class="nw">NEW!</span>':''}</div><div class="rr" style="color:${col};text-shadow:0 0 22px ${col}">${RAR[it.i]}</div>`;
+ $('#y',m).onclick=async()=>{if(crateOpening)return;if(!P||!c||!Number.isFinite(c.price)||c.price<0)return toast('Could not open this crate');
+  if(P.atoms<c.price)return toast('Not enough atoms');
+  crateOpening=true;const yes=$('#y',m);if(yes)yes.disabled=true;close();
+  try{
+   const it=roll(c);if(!it||!EL[it.n])throw new Error('Invalid crate reward');
+   const chance=it.w/wsum(c)*100;const prior=Math.max(0,Number(P.els[it.n])||0);const isNew=prior===0;
+   // Only charge after a valid reward has been selected; guard against double-clicks.
+   P.atoms-=c.price;P.els[it.n]=prior+1;ensureProgress();addXP(10+Math.max(0,it.i)*2+(isNew?20:0));missionProgress('open',isNew);persist();setBal();
+   if(instantOpenEnabled()){reveal(it,isNew,chance,P.els[it.n],true)}else{showLoading();await sleep(1700);hideLoading();reveal(it,isNew,chance,P.els[it.n],false)}
+  }catch(e){hideLoading();toast('Could not open crate. Try again.')}finally{crateOpening=false}
+ }})}
+function reveal(it,isNew,chance=it.w,owned=1,instant=false){const col=COL[RAR[it.i]],d=document.createElement('div');d.className='reveal rarity-'+it.i;d.style.setProperty('--rarity-color',col);
+ const pct=chance<.01?chance.toFixed(6):chance<1?chance.toFixed(3):chance.toFixed(2);
+ d.innerHTML=`<div class="rn">${nm(it.n)}</div><div><div class="rt ${instant?'float':''}" style="background-image:${tex(it.n)}">${isNew?'<span class="nw">NEW!</span>':''}</div><div class="rr" style="color:${col};text-shadow:0 0 22px ${col}">${RAR[it.i]}</div><div class="chance">Pull chance: ${pct}%</div><div class="dupe">${isNew?'First discovery':'Owned: '+fmt(owned)+' copies'}</div></div><div class="chance">Click anywhere to close</div>`;
  const cv=document.createElement('canvas');cv.id='pc';cv.width=innerWidth;cv.height=innerHeight;document.body.append(d,cv);
  const g=cv.getContext('2d'),mk=(burst)=>{const a=Math.random()*6.28,s=burst?2+Math.random()*(5+it.i):0;return{x:burst?cv.width/2:Math.random()*cv.width,y:burst?cv.height/2:-10,vx:Math.cos(a)*s,vy:burst?Math.sin(a)*s-1.5:.5+Math.random()*.9,r:Math.random()*6,w:2+Math.random()*2.5,h:4+Math.random()*6,life:0,max:230+Math.random()*120}};
- let Q=Array.from({length:80+it.i*30},()=>mk(true)),t0=performance.now();
+ let Q=Array.from({length:instant?0:80+it.i*30},()=>mk(true)),t0=performance.now();
  (function f(t){if(!d.isConnected)return cv.remove();g.clearRect(0,0,cv.width,cv.height);g.fillStyle=col;const el=t-t0;
-  if(el<3400)Q.push(mk(false));
+  if(!instant&&el<3400)Q.push(mk(false));
   Q=Q.filter(p=>{p.life++;p.x+=p.vx;p.y+=p.vy;p.vy+=.02;p.vx*=.99;p.r+=.1;g.globalAlpha=Math.max(0,1-p.life/p.max);g.save();g.translate(p.x,p.y);g.rotate(p.r);g.fillRect(-p.w/2,-p.h/2,p.w,p.h);g.restore();return p.life<p.max});
   requestAnimationFrame(f)})(t0);
- const end=()=>{d.classList.add('out');setTimeout(()=>d.remove(),850)};d.onclick=end;setTimeout(()=>d.isConnected&&end(),6200)}
+ const end=()=>{d.classList.add('out');setTimeout(()=>d.remove(),850)};d.onclick=end;setTimeout(()=>d.isConnected&&end(),instant?2800:6200)}
 
 let sel=null,view='own';
 function elements(){const own=Object.keys(P.els).filter(k=>EL[k]&&P.els[k]>0).sort((a,b)=>EL[b].r-EL[a].r||a.localeCompare(b));
