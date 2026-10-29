@@ -118,6 +118,68 @@ input.pill{cursor:text}.pill:not(input):hover{background:#cde;transform:scale(.9
 .warn{position:fixed;left:50%;bottom:.5rem;transform:translateX(-50%);z-index:30;background:#7a1010;color:#fff;border-radius:.6rem;padding:.4rem .9rem;font-size:.9rem;max-width:min(92vw,44rem);text-align:center;box-shadow:0 0 12px #f33;line-height:1.3}
 .crate{background:color-mix(in srgb,var(--c) 30%,#050505);box-shadow:0 0 14px color-mix(in srgb,var(--c) 55%,transparent)}.crate .nm{font-size:1.12rem;text-shadow:0 0 3px rgba(255,255,255,.3)}.crate .pr{font-size:1.2rem;gap:.3rem}.crate .atom{width:1.35rem;height:1.35rem}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+/* Picklet-inspired button system — adapted to Betastar's existing selectors */
+:root{
+  --color-green-500:#22c55e;--color-green-700:#15803d;
+  --color-blue-500:#3b82f6;--color-blue-700:#1d4ed8;
+  --color-zinc-500:#71717a;--color-zinc-700:#3f3f46;
+  --color-red-500:#ef4444;--color-red-700:#b91c1c;
+}
+button.btn,button.lbtn,input.loginButton{
+  background:var(--color-green-500);color:#fff;
+  box-shadow:0 5px var(--color-green-700);filter:none;
+  transition:transform .3s cubic-bezier(.175,.885,.32,1.275),filter .2s,box-shadow .2s;
+}
+button.btn:hover,button.lbtn:hover,input.loginButton:hover{
+  transform:translateY(-2px);filter:brightness(1.1);
+  box-shadow:0 7px var(--color-green-700);
+}
+button.btn:active,button.lbtn:active,input.loginButton:active{
+  transform:translateY(0);box-shadow:0 3px var(--color-green-700);
+}
+button.btn:disabled,input.loginButton:disabled{opacity:.6;box-shadow:0 2px var(--color-green-700);filter:none}
+button.lbtn#lgb{background:var(--color-green-500);box-shadow:0 5px var(--color-green-700)}
+button.lbtn#rb{background:var(--color-blue-500);box-shadow:0 5px var(--color-blue-700)}
+button.lbtn#rb:hover{box-shadow:0 7px var(--color-blue-700)}
+button.lbtn#rb:active{box-shadow:0 3px var(--color-blue-700)}
+button.btn.blue-button,#backup,#restoreBackup{
+  background:var(--color-blue-500);box-shadow:0 5px var(--color-blue-700);color:#fff
+}
+button.btn.blue-button:hover,#backup:hover,#restoreBackup:hover{box-shadow:0 7px var(--color-blue-700)}
+button.btn.blue-button:active,#backup:active,#restoreBackup:active{box-shadow:0 3px var(--color-blue-700)}
+button.btn.gray-button,#cp,#lo{
+  background:var(--color-zinc-500);box-shadow:0 5px var(--color-zinc-700);color:#fff
+}
+button.btn.gray-button:hover,#cp:hover,#lo:hover{box-shadow:0 7px var(--color-zinc-700)}
+button.btn.gray-button:active,#cp:active,#lo:active{box-shadow:0 3px var(--color-zinc-700)}
+button.btn.red-button,#de{
+  background:var(--color-red-500);box-shadow:0 5px var(--color-red-700);color:#fff
+}
+button.btn.red-button:hover,#de:hover{box-shadow:0 7px var(--color-red-700)}
+button.btn.red-button:active,#de:active{box-shadow:0 3px var(--color-red-700)}
+button.b,.pop button.b{
+  background:var(--color-zinc-500);color:#fff;
+  box-shadow:0 4px var(--color-zinc-700);
+  transition:all .3s cubic-bezier(.175,.885,.32,1.275);
+}
+.pop button.b:hover,button.b:hover{transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 6px var(--color-zinc-700)}
+.pop button.b:active,button.b:active{transform:translateY(0);box-shadow:0 2px var(--color-zinc-700)}
+button.b#ok{background:var(--color-green-500);box-shadow:0 4px var(--color-green-700)}
+.pop button.b#ok:hover{box-shadow:0 6px var(--color-green-700)}
+.pop button.b#ok:active{box-shadow:0 2px var(--color-green-700)}
+button.mini,button.pill{transition:all .3s cubic-bezier(.175,.885,.32,1.275)}
+button.mini:hover,button.pill:not(input):hover{transform:translateY(-2px);filter:brightness(1.1)}
+button.mini:active,button.pill:not(input):active{transform:translateY(0)}
+/* Explicit variants are available for future buttons without changing markup structure. */
+button.primary-button{background:var(--color-green-500);box-shadow:0 5px var(--color-green-700);color:#fff}
+button.blue-button{background:var(--color-blue-500);box-shadow:0 5px var(--color-blue-700);color:#fff}
+button.gray-button{background:var(--color-zinc-500);box-shadow:0 5px var(--color-zinc-700);color:#fff}
+button.red-button{background:var(--color-red-500);box-shadow:0 5px var(--color-red-700);color:#fff}
+button.picklet-button{margin-bottom:5px;transition:all .3s cubic-bezier(.175,.885,.32,1.275)}
+button.picklet-button:hover{transform:translateY(-2px);filter:brightness(1.1)}
+button.picklet-button:active{transform:translateY(0)}
+
 </style>
 
 </head>
