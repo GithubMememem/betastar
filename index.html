@@ -631,16 +631,13 @@ function reveal(it,isNew,chance=it.w,owned=1,instant=false){
  const col=COL[RAR[it.i]],d=document.createElement('div');d.className='reveal';
  d.innerHTML=`<div class="rn">${nm(it.n)}</div><div class="revealCenter"><div class="rt" style="background-image:${tex(it.n)}">${isNew?'<span class="nw">NEW!</span>':''}</div><div class="rr" style="color:${col};text-shadow:0 0 22px ${col}">${RAR[it.i]}</div><div class="chance">Pull chance: ${(chance<.01?chance.toFixed(6):chance<1?chance.toFixed(3):chance.toFixed(2))}%</div><div class="chance">${isNew?'First discovery':'Owned: '+fmt(owned)}</div></div><div class="revealHint">Click anywhere to close</div>`;
  const cv=document.createElement('canvas');cv.id='pc';cv.width=innerWidth;cv.height=innerHeight;document.body.append(d,cv);
- const g=cv.getContext('2d'),colors=['#f7d154','#f26b5b','#65c8ef','#8dd58a','#c49aff','#ffffff','#f49ac2'];
- const burst=()=>Array.from({length:instant?0:Math.min(180,90+it.i*18)},()=>{const a=Math.random()*Math.PI*2,v=3+Math.random()*8;return{x:cv.width/2+(Math.random()-.5)*50,y:cv.height*.48+(Math.random()-.5)*35,vx:Math.cos(a)*v,vy:Math.sin(a)*v-3-Math.random()*3,w:5+Math.random()*7,h:7+Math.random()*10,rot:Math.random()*6,spin:(Math.random()-.5)*.22,life:0,max:100+Math.random()*100,color:colors[Math.floor(Math.random()*colors.length)]}});
- let particles=burst(),last=0,frame;
- function draw(t){if(!d.isConnected){cancelAnimationFrame(frame);cv.remove();return}const dt=Math.min(2,(t-last)/16.67||1);last=t;g.clearRect(0,0,cv.width,cv.height);
-  if(!instant&&t%180<18&&particles.length<150)particles.push({x:Math.random()*cv.width,y:-15,vx:(Math.random()-.5)*1.8,vy:1+Math.random()*2,w:5+Math.random()*6,h:7+Math.random()*9,rot:Math.random()*6,spin:(Math.random()-.5)*.08,life:0,max:180+Math.random()*100,color:colors[Math.floor(Math.random()*colors.length)]});
-  particles=particles.filter(p=>{p.life+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.12*dt;p.vx*=.995;p.rot+=p.spin*dt;const alpha=Math.min(1,(p.max-p.life)/28);if(alpha<=0)return false;g.save();g.globalAlpha=alpha;g.translate(p.x,p.y);g.rotate(p.rot);g.fillStyle=p.color;g.fillRect(-p.w/2,-p.h/2,p.w,p.h);g.restore();return p.life<p.max&&p.y<cv.height+30});
-  frame=requestAnimationFrame(draw)}
- frame=requestAnimationFrame(draw);
- const end=()=>{if(!d.isConnected)return;d.classList.add('out');cv.style.opacity='0';setTimeout(()=>{d.remove();cv.remove();cancelAnimationFrame(frame)},650)};
- d.onclick=end;setTimeout(()=>d.isConnected&&end(),instant?2800:6200)
+ const g=cv.getContext('2d'),mk=(burst)=>{const a=Math.random()*6.28,s=burst?2+Math.random()*(5+it.i):0;return{x:burst?cv.width/2:Math.random()*cv.width,y:burst?cv.height/2:-10,vx:Math.cos(a)*s,vy:burst?Math.sin(a)*s-1.5:.5+Math.random()*.9,r:Math.random()*6,w:2+Math.random()*2.5,h:4+Math.random()*6,life:0,max:230+Math.random()*120}};
+ let Q=Array.from({length:80+it.i*30},()=>mk(true)),t0=performance.now(),frame;
+ (function f(t){if(!d.isConnected){cv.remove();return}g.clearRect(0,0,cv.width,cv.height);g.fillStyle=col;const el=t-t0;
+  if(el<3400)Q.push(mk(false));
+  Q=Q.filter(p=>{p.life++;p.x+=p.vx;p.y+=p.vy;p.vy+=.02;p.vx*=.99;p.r+=.1;g.globalAlpha=Math.max(0,1-p.life/p.max);g.save();g.translate(p.x,p.y);g.rotate(p.r);g.fillRect(-p.w/2,-p.h/2,p.w,p.h);g.restore();return p.life<p.max});
+  frame=requestAnimationFrame(f)})(t0);
+ const end=()=>{if(!d.isConnected)return;d.classList.add('out');setTimeout(()=>{d.remove();cv.remove();cancelAnimationFrame(frame)},850)};d.onclick=end;setTimeout(()=>d.isConnected&&end(),6200)
 }
 
 let sel=null,view='own';
