@@ -58,7 +58,7 @@ input.pill{cursor:text}.pill:not(input):hover{background:#cde;transform:scale(.9
 .gt{width:2.9rem;aspect-ratio:1;border:2px solid #fff;border-radius:.25rem;background:#111 center/cover;cursor:pointer;transition:.2s}.gt:hover{transform:scale(1.15)}.gt.s{box-shadow:0 0 10px #fff}.gt.lock{filter:brightness(.18) grayscale(1);border-color:#555}
 .menu{position:fixed;z-index:60;background:#111e;border-radius:.3rem;overflow:hidden;font-size:.85rem}.menu p{margin:0;padding:.15rem .8rem;cursor:pointer}.menu p:hover{color:#8ed0ff}
 .chat{max-width:56rem;margin:.4rem auto;padding:0 .8rem}.cbox{height:60vh;overflow:auto;background:#0f0f0f;border-radius:.9rem;padding:.5rem}
-.msg{padding:.25rem .6rem;border-radius:.45rem;font-size:1rem;line-height:1.3;word-break:break-word}.msg:hover{background:#171717}.msg b{font-weight:400;margin-right:.4rem}.msg i{font-style:normal;opacity:.4;font-size:.65rem;margin-right:.4rem}
+.msg{padding:.25rem .6rem;border-radius:.45rem;font-size:1rem;line-height:1.3;word-break:break-word;display:flex;align-items:flex-start;gap:.3rem}.msg:hover{background:#171717}.msg .mt{flex:1;min-width:0}.msg b{font-weight:400;margin-right:.4rem}.msg i{font-style:normal;opacity:.4;font-size:.65rem;margin-right:.4rem}.msgdel{border:0;border-radius:.3rem;background:#351313;color:#ffb5b5;cursor:pointer;font:inherit;font-size:.75rem;padding:0 .35rem;opacity:.35}.msg:hover .msgdel{opacity:1}.tradewrap{max-width:58rem;margin:.5rem auto;padding:0 .8rem}.tradecard{background:#0f0f0f;border-radius:.7rem;padding:.8rem;margin:.6rem 0;text-align:left}.tradegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.6rem;width:100%}.tradegrid label{font-size:.85rem;opacity:.8}.tradegrid input,.tradegrid select{width:100%;height:2rem;border:0;border-radius:.4rem;padding:.2rem .5rem;background:#fff;color:#222;font:inherit}.tradeactions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}.smallnote{font-size:.8rem;opacity:.6}
 .cin{display:flex;gap:.5rem;margin-top:.6rem;flex-direction:row}.cin .fld{flex:1;width:auto;text-align:left;padding:0 .8rem}.cin .btn{min-width:5rem;padding:.1rem 1rem;font-size:1.1rem}
 .fr{display:flex;gap:1rem;padding:.4rem .8rem;max-width:62rem;margin:0 auto;flex-wrap:wrap}.flist{flex:0 0 17rem;width:min(100%,17rem);background:#0f0f0f;border-radius:.9rem;padding:.7rem;min-height:60vh}
 .dm{flex:1;min-width:16rem}.dh{font-size:1.3rem;margin-bottom:.4rem;text-align:left}.fh{font-size:1.4rem;margin-bottom:.3rem}.fs{font-size:.8rem;opacity:.6;margin:.7rem 0 .2rem;text-align:left}
@@ -237,14 +237,16 @@ const L={mode:'local',shared:false,
  async changePass(p){const d=L.d();d.cred[P.id]=await hash(P.lname+p);L.w(d)},
  ls:new Set(),notify(){L.ls.forEach(f=>f())},listen(fn){L.ls.add(fn);fn();return()=>L.ls.delete(fn)},
  chatSub(cb){return L.listen(()=>cb(L.d().chat.slice(-60)))},
- async chatSend(m){const d=L.d();d.chat.push(m);d.chat=d.chat.slice(-CHATMAX);L.w(d);L.notify()},
+ async chatSend(m){const d=L.d();d.chat.push({...m,id:m.id||('m'+Date.now().toString(36)+Math.random().toString(36).slice(2))});d.chat=d.chat.slice(-CHATMAX);L.w(d);L.notify()},
+ async chatDel(id){const d=L.d();const m=d.chat.find(x=>x.id===id);if(!m)return;if(m.uid!==P.id&&!isOwner())throw Error('Not allowed');d.chat=d.chat.filter(x=>x.id!==id);L.w(d);L.notify()},
  fd(){const d=L.d();d.friends=d.friends||{};d.dms=d.dms||{};return d},
  friendsSub(cb){return L.listen(()=>cb(Object.entries(L.fd().friends).filter(([k,v])=>v.users.includes(P.id)).map(([k,v])=>({pair:k,...v}))))},
  async friendReq(t){const d=L.fd();d.friends[pairId(P.id,t.id)]={users:[P.id,t.id],names:{[P.id]:P.name,[t.id]:t.name},from:P.id,status:'pending',ts:Date.now()};L.w(d);L.notify()},
  async friendAccept(k){const d=L.fd();d.friends[k].status='accepted';L.w(d);L.notify()},
  async friendDel(k){const d=L.fd();delete d.friends[k];L.w(d);L.notify()},
  dmSub(k,cb){return L.listen(()=>cb((L.fd().dms[k]||[]).slice(-60)))},
- async dmSend(k,m){const d=L.fd();(d.dms[k]=d.dms[k]||[]).push(m);d.dms[k]=d.dms[k].slice(-CHATMAX);L.w(d);L.notify()}};
+ async dmSend(k,m){const d=L.fd();(d.dms[k]=d.dms[k]||[]).push({...m,id:m.id||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2))});d.dms[k]=d.dms[k].slice(-CHATMAX);L.w(d);L.notify()},
+ async dmDel(k,id){const d=L.fd(),a=d.dms[k]||[],m=a.find(x=>x.id===id);if(!m)return;if(m.from!==P.id&&!isOwner())throw Error('Not allowed');d.dms[k]=a.filter(x=>x.id!==id);L.w(d);L.notify()}};
 addEventListener('storage',e=>{if(e.key==='bs_local')L.notify()});
 /* 3) Firebase: real accounts + shared data for a self-hosted site */
 const F={mode:'firebase',shared:true,
@@ -261,14 +263,16 @@ const F={mode:'firebase',shared:true,
   try{const pl=await F.get(c.user.uid);return pl?{pl}:{err:'Profile not found.'}}catch(e){return{err:F.fe(e)}}},
  async restore(){const u=F.auth.currentUser;return u?F.get(u.uid):null},async logout(){await F.au.signOut(F.auth)},
  top(cb,err){return F.fs.onSnapshot(F.fs.query(F.col('players'),F.fs.orderBy('atoms','desc'),F.fs.limit(10)),s=>cb(s.docs.map(d=>d.data())),err)},
- chatSub(cb,err){return F.fs.onSnapshot(F.fs.query(F.col('chat'),F.fs.orderBy('ts','desc'),F.fs.limit(60)),s=>cb(s.docs.map(d=>d.data()).reverse()),err)},
+ chatSub(cb,err){return F.fs.onSnapshot(F.fs.query(F.col('chat'),F.fs.orderBy('ts','desc'),F.fs.limit(60)),s=>cb(s.docs.map(d=>({...d.data(),id:d.id})).reverse()),err)},
  async chatSend(m){await F.fs.addDoc(F.col('chat'),m)},
+ async chatDel(id){await F.fs.deleteDoc(F.fs.doc(F.db,'chat',id))},
  fdoc:k=>F.fs.doc(F.db,'friends',k),
  friendsSub(cb,err){return F.fs.onSnapshot(F.fs.query(F.col('friends'),F.fs.where('users','array-contains',P.id)),s=>cb(s.docs.map(d=>({pair:d.id,...d.data()}))),err)},
  async friendReq(t){await F.fs.setDoc(F.fdoc(pairId(P.id,t.id)),{users:[P.id,t.id],names:{[P.id]:P.name,[t.id]:t.name},from:P.id,status:'pending',ts:Date.now()})},
  async friendAccept(k){await F.fs.updateDoc(F.fdoc(k),{status:'accepted'})},async friendDel(k){await F.fs.deleteDoc(F.fdoc(k))},
- dmSub(k,cb,err){return F.fs.onSnapshot(F.fs.query(F.fs.collection(F.db,'dms',k,'msgs'),F.fs.orderBy('ts','desc'),F.fs.limit(60)),s=>cb(s.docs.map(d=>d.data()).reverse()),err)},
+ dmSub(k,cb,err){return F.fs.onSnapshot(F.fs.query(F.fs.collection(F.db,'dms',k,'msgs'),F.fs.orderBy('ts','desc'),F.fs.limit(60)),s=>cb(s.docs.map(d=>({...d.data(),id:d.id})).reverse()),err)},
  async dmSend(k,m){await F.fs.addDoc(F.fs.collection(F.db,'dms',k,'msgs'),m)},
+ async dmDel(k,id){await F.fs.deleteDoc(F.fs.doc(F.db,'dms',k,'msgs',id))},
  playerSub(id,cb){return F.fs.onSnapshot(F.pd(id),s=>{if(s.metadata.hasPendingWrites)return;cb(s.exists()?s.data():null)})},
  cfgSub(cb){return F.fs.onSnapshot(F.fs.doc(F.db,'config','main'),s=>cb(s.exists()?s.data():null))},
  async cfgSet(o){await F.fs.setDoc(F.fs.doc(F.db,'config','main'),o,{merge:true})},
@@ -375,10 +379,11 @@ function leaders(){const rk=['1st','2nd','3rd'],rc=['#ffd700','#fff','#ff9a2e'];
 
 let lastSend=0;
 function makeDraw(cb){let first=true;const f=list=>{const near=cb.scrollHeight-cb.scrollTop-cb.clientHeight<80||first;
- cb.innerHTML=list.map(m=>`<div class="msg"><i>${new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</i><b style="color:${nameCol(m.name)}">${esc(m.name)}</b>${esc(m.text)}</div>`).join('')||'<div class="msg" style="opacity:.5">No messages yet — say hi!</div>';
+ cb.innerHTML=list.map(m=>'<div class="msg"><div class="mt"><i>'+new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</i><b style="color:'+nameCol(m.name)+'">'+esc(m.name)+'</b>'+esc(m.text)+'</div>'+(m.id&&(m.uid===P.id||m.from===P.id||isOwner())?'<button class="msgdel" title="Delete message" data-del="'+esc(m.id)+'">Delete</button>':'')+'</div>').join('')||'<div class="msg" style="opacity:.5">No messages yet — say hi!</div>';
  first=false;if(near)cb.scrollTop=cb.scrollHeight};f.reset=()=>{first=true};return f}
 function chat(){shell('chat',`<div class="chat"><div class="cbox" id="cb"></div><form class="cin" id="cf"><input class="fld" id="ci" placeholder="Type a message…" maxlength="${CHATMAX}" autocomplete="off"><input class="btn" type="submit" value="Send"></form></div>`);
  try{unsub=B.chatSub(makeDraw($('#cb')),()=>toast('Chat unavailable'))}catch(e){toast('Chat unavailable')}
+ $('#cb').onclick=async e=>{const b=e.target.closest('[data-del]');if(!b)return;if(!confirm('Delete this message?'))return;try{await B.chatDel(b.dataset.del);toast('Message deleted')}catch(x){toast('Could not delete message')}};
  $('#cf').onsubmit=async e=>{e.preventDefault();const t=$('#ci').value.replace(/\s+/g,' ').trim();if(!t)return;
   if(Date.now()-lastSend<1200)return toast('Slow down!');lastSend=Date.now();$('#ci').value='';
   try{await B.chatSend({uid:P.id,name:P.name,text:t.slice(0,CHATMAX),ts:Date.now()});chatReward(t)}catch(x){toast('Message failed to send')}};$('#ci').focus()}
@@ -387,6 +392,7 @@ function friends(){let dmPair=null,dmu=null;
  shell('home',`<div class="fr"><div class="flist"><div class="fh">Friends</div><input class="pill" id="fn" placeholder="Add friend by username" maxlength="16"><button class="pill" id="fb">Send Request</button><div id="fl"></div></div>
  <div class="dm"><div class="dh" id="dh">Select a friend to message</div><div class="cbox" id="dbx"></div><form class="cin" id="df"><input class="fld" id="di" placeholder="Message…" maxlength="${CHATMAX}" autocomplete="off" disabled><input class="btn" type="submit" value="Send"></form></div></div>`);
  const draw=makeDraw($('#dbx'));
+ $('#dbx').onclick=async e=>{const b=e.target.closest('[data-del]');if(!b)return;if(!confirm('Delete this direct message?'))return;try{await B.dmDel(dmPair,b.dataset.del);toast('Message deleted')}catch(x){toast('Could not delete message')}};
  const closeDm=()=>{dmu&&dmu();dmu=null;dmPair=null;$('#dh').textContent='Select a friend to message';$('#di').disabled=true;$('#dbx').innerHTML=''};
  const openDm=(pair,name)=>{dmu&&dmu();dmPair=pair;$('#dh').textContent=name;$('#di').disabled=false;$('#di').focus();draw.reset();
   try{dmu=B.dmSub(pair,draw,()=>toast('Messages unavailable'))}catch(e){toast('Messages unavailable')}list()};
