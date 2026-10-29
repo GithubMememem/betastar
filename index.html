@@ -302,30 +302,6 @@ input.loginButton:active{transform:translateX(-50%) translateY(1px);box-shadow:0
 @media(prefers-reduced-motion:reduce){.crate,.crate .ct{transition:none!important}}
 
 
-/* Blacket-inspired pack browser and selected-pack preview */
-.packBrowser{display:grid;grid-template-columns:minmax(0,1fr) minmax(13rem,18rem);gap:1rem;margin:.55rem .7rem 1.5rem;align-items:start}
-.packBrowserMain{min-width:0;background:#080b3e;border:1px solid #252b72;border-radius:.45rem;padding:.65rem;box-shadow:0 8px 24px #0008}
-.packBrowserTop{display:flex;gap:.6rem;align-items:center;padding:.1rem 0 .65rem;border-bottom:2px solid #d8d9ef}
-.packBrowserTop .fld{flex:1;min-width:0;text-align:center;background:#252957;border-color:#454b80}
-.packShelf{padding-top:.55rem}
-.packShelfHeading{font-size:1.05rem;padding:.1rem 0 .35rem;border-bottom:2px solid #d8d9ef;text-shadow:0 1px 3px #000}
-.packShelfGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(3.15rem,1fr));gap:.45rem;padding:.55rem 0 .8rem}
-.packThumb{min-width:0;border:1px solid #6d78a8;background:#111743;border-radius:.35rem;padding:.22rem;display:flex;flex-direction:column;align-items:center;gap:.2rem;cursor:pointer;color:#fff;font:inherit;transition:transform .15s,border-color .15s,background .15s;box-shadow:0 2px 5px #0008}
-.packThumb:hover{transform:translateY(-2px);border-color:#fff;background:#222b62}
-.packThumb.selected{border:2px solid #fff;background:#343d80;box-shadow:0 0 12px #aebdff88}
-.packThumb[hidden]{display:none}
-.packThumbArt{display:block;width:2.75rem;height:2.75rem;border-radius:.22rem;background-color:#222;background-repeat:no-repeat;box-shadow:inset 0 0 0 1px #ffffff55}
-.packThumbName{font-size:.68rem;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.packInspect{position:sticky;top:.7rem;display:flex;flex-direction:column;align-items:center;gap:.65rem;padding:.4rem}
-.packInspectCard{--c:#6a2fc9;width:100%;aspect-ratio: .78;max-height:23rem;border:1px solid color-mix(in srgb,var(--c) 65%,#fff);border-radius:.55rem;padding:.7rem;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:.5rem;background:linear-gradient(145deg,color-mix(in srgb,var(--c) 70%,#e3c9a0),color-mix(in srgb,var(--c) 34%,#241b3c));box-shadow:0 7px 18px #000a,inset 0 0 0 4px #0002}
-.packInspectTitle{font-size:clamp(1.05rem,2vw,1.5rem);text-align:center;text-shadow:0 2px 4px #000a}
-.packInspectArt{width:min(78%,10rem);aspect-ratio:1;border-radius:.65rem;background-color:#15152a;background-size:cover;background-position:center;background-repeat:no-repeat;border:5px solid #f5e8ca;box-shadow:0 4px 12px #0009,0 0 0 1px #5b442c}
-.packInspectPrice{font-size:1.1rem;text-shadow:0 2px 4px #000}
-.packBuyButton{width:100%;border:1px solid #c9d1ff;border-radius:.4rem;padding:.65rem;background:#202b72;color:#fff;font:inherit;font-size:1rem;cursor:pointer;box-shadow:0 3px 0 #080d39;transition:.15s}
-.packBuyButton:hover{background:#35459e;transform:translateY(-2px)}
-.packBuyButton:active{transform:translateY(1px);box-shadow:0 1px 0 #080d39}
-.packInspectHint{font-size:.75rem;opacity:.65;text-align:center}
-@media(max-width:650px){.packBrowser{grid-template-columns:1fr}.packInspect{position:static;max-width:17rem;width:100%;margin:.2rem auto}.packInspectCard{aspect-ratio:1.05}.packInspectArt{width:6.5rem}.packBrowserTop{flex-wrap:wrap}.packBrowserTop .fld{flex-basis:100%}}
 
 </style>
 
@@ -673,23 +649,9 @@ function settings(){shell('settings',`<div class="center"><div class="title" sty
 function instantOpenEnabled(){try{return localStorage.getItem('betastarInstantOpen')==='true'}catch(e){return false}}
 function setInstantOpen(on){try{localStorage.setItem('betastarInstantOpen',on?'true':'false')}catch(e){}}
 function crates(){
- const first=CRATES[0];
- shell('crates',`<div class="packBrowser">
-   <div class="packBrowserMain">
-    <div class="packBrowserTop"><input class="fld" id="crateSearch" placeholder="Search packs…" aria-label="Search packs"><button class="instantToggle bsButton3d" id="instantToggle" aria-pressed="${instantOpenEnabled()}" type="button">Instant Open: ${instantOpenEnabled()?'On':'Off'}</button></div>
-    <div class="packShelf"><div class="packShelfHeading">Available Packs</div><div class="packShelfGrid" id="packShelfGrid">${CRATES.map((c,i)=>`<button type="button" class="packThumb${i===0?' selected':''}" style="--c:${c.color}" data-i="${i}" data-name="${c.name.toLowerCase()}" aria-label="${c.name} Pack"><span class="packThumbArt" style="background-image:${CT[c.name]};background-size:cover;background-position:center"></span><span class="packThumbName">${c.name}</span></button>`).join('')}</div></div>
-   </div>
-   <aside class="packInspect" id="packInspect"><div class="packInspectCard" id="packInspectCard" style="--c:${first.color}"><div class="packInspectTitle" id="packInspectTitle">${first.name} Pack</div><div class="packInspectArt" id="packInspectArt" style="background-image:${CT[first.name]}"></div><div class="packInspectPrice" id="packInspectPrice">${fmt(first.price)} ${ATOM}</div></div><button class="packBuyButton" id="packBuyButton" type="button">Open Pack</button><div class="packInspectHint">Select a pack to preview it</div></aside>
-  </div>`);
+ shell('crates',`<div class="crateTools"><input class="fld" id="crateSearch" placeholder="Search crates…" aria-label="Search crates"><button class="instantToggle bsButton3d" id="instantToggle" aria-pressed="${instantOpenEnabled()}" type="button">Instant Open: ${instantOpenEnabled()?'On':'Off'}</button></div><div class="crates">${CRATES.map((c,i)=>`<div class="crate${c.name==='Spungle'?' sol':''}" style="--c:${c.color}" data-i="${i}" data-name="${c.name.toLowerCase()}"><div class="nm">${c.name} Crate</div><div class="ct" style="background:${CT[c.name]}${CT[c.name].startsWith('url')?' center/cover':''}"></div><div class="pr">${fmt(c.price)} ${ATOM}</div></div>`).join('')}</div>`);
  const toggle=$('#instantToggle');toggle.onclick=()=>{const on=!instantOpenEnabled();setInstantOpen(on);toggle.textContent='Instant Open: '+(on?'On':'Off');toggle.setAttribute('aria-pressed',String(on));toast('Instant Open '+(on?'enabled':'disabled'))};
- let selected=0;
- const choose=i=>{selected=i;const c=CRATES[i];document.querySelectorAll('.packThumb').forEach((e,j)=>e.classList.toggle('selected',j===i));$('#packInspectCard').style.setProperty('--c',c.color);$('#packInspectTitle').textContent=c.name+' Pack';$('#packInspectArt').style.backgroundImage=CT[c.name];$('#packInspectPrice').innerHTML=fmt(c.price)+' '+ATOM;$('#packBuyButton').textContent='Open Pack';};
- const tiles=[...document.querySelectorAll('.packThumb')];
- tiles.forEach(e=>e.onclick=()=>choose(Number(e.dataset.i)));
- $('#crateSearch').oninput=()=>{const q=$('#crateSearch').value.trim().toLowerCase();tiles.forEach(e=>e.hidden=!e.dataset.name.includes(q));const visible=tiles.find(e=>!e.hidden);if(visible)choose(Number(visible.dataset.i));};
- $('#packBuyButton').onclick=()=>buy(CRATES[selected]);
-}
-
+ const tiles=[...document.querySelectorAll('.crate')];$('#crateSearch').oninput=()=>{const q=$('#crateSearch').value.trim().toLowerCase();tiles.forEach(e=>e.style.display=e.dataset.name.includes(q)?'':'none')};tiles.forEach(e=>e.onclick=()=>buy(CRATES[e.dataset.i]))}
 const wsum=c=>c.items.reduce((a,x)=>a+x.w,0);
 const RCW={Common:'#555',Uncommon:'#2e9a1b',Rare:'#2a2aff',Epic:'#d00000',Legendary:'#ff8c00',Fabled:'#0c7500',Perfect:'#c9a800',Mythical:'#a335ee',Divine:'#d14fd1'};
 function rates(c){const t=wsum(c),pc=v=>v<.01?(+v.toFixed(6))+'%':v<1?v.toFixed(3)+'%':v.toFixed(2)+'%',rows=c.items.slice().sort((a,b)=>a.i-b.i||b.w-a.w);
