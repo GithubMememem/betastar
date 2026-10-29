@@ -79,7 +79,7 @@ input.pill{cursor:text}.pill:not(input):hover{background:#cde;transform:scale(.9
 @keyframes tileIn{0%{opacity:0;transform:scale(.3);filter:brightness(0)}35%{opacity:1;transform:scale(1);filter:brightness(0)}100%{opacity:1;transform:scale(1);filter:none}}
 #pc{position:fixed;inset:0;z-index:71;pointer-events:none}
 #toast{position:fixed;top:3rem;left:50%;transform:translateX(-50%);background:#222e;padding:.3rem 1rem;border-radius:.6rem;z-index:99;opacity:0;transition:opacity .4s ease;pointer-events:none;font-size:1rem}#toast.show{opacity:1}
-.biobox{background:#0f0f0f;border-radius:.9rem;padding:.6rem .9rem;width:min(22rem,88vw);margin:.9rem auto 0;font-size:1rem;line-height:1.35;overflow-wrap:anywhere;text-align:left}.biobox .bh{font-size:.8rem;opacity:.55;margin-bottom:.2rem}
+.progressCard{background:#0f0f0f;border-radius:.8rem;padding:.65rem .8rem;width:min(28rem,92vw);margin:1rem auto;text-align:left;box-shadow:0 0 12px #9cc7de22}.progTop{display:flex;justify-content:space-between;gap:.5rem;align-items:center;font-size:1.05rem}.xpTrack{height:.65rem;background:#292929;border-radius:1rem;overflow:hidden;margin:.45rem 0}.xpFill{height:100%;background:linear-gradient(90deg,#9cc7de,#eafaff);box-shadow:0 0 10px #9cc7de;transition:width .35s}.progMeta{font-size:.75rem;opacity:.65;display:flex;justify-content:space-between;gap:.5rem}.quest{font-size:.82rem;padding:.3rem 0;border-top:1px solid #242424;display:flex;justify-content:space-between;gap:.5rem}.quest strong{font-weight:400;color:#9cc7de}.achrow{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.4rem}.ach{font-size:.7rem;padding:.18rem .45rem;border:1px solid #444;border-radius:1rem;opacity:.8}.ach.done{border-color:#9cc7de;color:#dff6ff;box-shadow:0 0 7px #9cc7de44}.biobox{background:#0f0f0f;border-radius:.9rem;padding:.6rem .9rem;width:min(22rem,88vw);margin:.9rem auto 0;font-size:1rem;line-height:1.35;overflow-wrap:anywhere;text-align:left}.biobox .bh{font-size:.8rem;opacity:.55;margin-bottom:.2rem}
 .land,.auth{position:relative;height:100vh;overflow:hidden}
 .blaxText{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);font-size:10vw;white-space:nowrap;text-shadow:0 0 15px #fff;animation:zoomInBlax 1s ease forwards}
 @keyframes zoomInBlax{0%{font-size:0}50%{font-size:10.5vw}100%{font-size:10vw}}
@@ -225,7 +225,7 @@ const ATOM='<svg class="atom" viewBox="0 0 512 512"><ellipse cx="256" cy="256" r
 
 /* ===================== BACKENDS ===================== */
 const mem={},store={get:k=>{try{return localStorage.getItem(k)}catch{return mem[k]??null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{mem[k]=v}},del:k=>{try{localStorage.removeItem(k)}catch{delete mem[k]}}};
-const newPlayer=(id,n)=>({id,name:n,lname:n.toLowerCase(),atoms:START_ATOMS,els:{},role:n.toLowerCase()==='yeebus'?'Owner':'Common',avatar:'',last:0,streak:0,bio:'',created:Date.now()});
+const newPlayer=(id,n)=>({id,name:n,lname:n.toLowerCase(),atoms:START_ATOMS,els:{},xp:0,level:1,stats:{opens:0,discoveries:0},questDay:'',quest:{opens:0,discoveries:0,daily:false},role:n.toLowerCase()==='yeebus'?'Owner':'Common',avatar:'',last:0,streak:0,bio:'',created:Date.now()});
 const pairId=(a,b)=>[a,b].sort().join('_');;
 const CHATMAX=200;
 /* 1) Local test mode: everything stays in this browser */
@@ -318,6 +318,11 @@ function shell(page,inner){
  $('#app').querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>e.dataset.go==='logout'?logout():go(e.dataset.go));shown=P?P.atoms:0}
 let shown=0,tw=0;
 function setBal(){const el=$('#bal');if(el)el.textContent=fmt(P.atoms)}
+const xpNeed=l=>100+Math.max(0,(l-1))*50;
+function ensureProgress(){if(!P)return;P.xp=Math.max(0,Number(P.xp)||0);P.level=Math.max(1,Number(P.level)||1);P.stats=P.stats&&typeof P.stats==='object'?P.stats:{opens:0,discoveries:0};P.stats.opens=Number(P.stats.opens)||0;P.stats.discoveries=Number(P.stats.discoveries)||0;const day=new Date().toLocaleDateString('en-CA');if(P.questDay!==day){P.questDay=day;P.quest={opens:0,discoveries:0,daily:false}}P.quest=P.quest&&typeof P.quest==='object'?P.quest:{opens:0,discoveries:0,daily:false};P.quest.opens=Number(P.quest.opens)||0;P.quest.discoveries=Number(P.quest.discoveries)||0;P.quest.daily=!!P.quest.daily;while(P.xp>=xpNeed(P.level)){P.xp-=xpNeed(P.level);P.level++}}
+function addXP(n){ensureProgress();const old=P.level;P.xp+=Math.max(0,Math.floor(n));while(P.xp>=xpNeed(P.level)){P.xp-=xpNeed(P.level);P.level++}if(P.level>old){toast('Level up! You reached Level '+P.level);ding()}}
+function progressHTML(){ensureProgress();const need=xpNeed(P.level),pct=Math.min(100,P.xp/need*100),owned=Object.values(P.els||{}).filter(v=>v>0).length;const qs=[['Open 3 crates',Math.min(P.quest.opens,3),3],['Discover 2 new elements',Math.min(P.quest.discoveries,2),2],['Claim today’s reward',P.quest.daily?1:0,1]];const ach=[['First discovery',P.stats.discoveries>=1],['Collector 10',owned>=10],['Collector 50',owned>=50],['Crate opener 25',P.stats.opens>=25],['Level 5',P.level>=5],['Level 10',P.level>=10]];return `<div class="progressCard"><div class="progTop"><span>Level ${P.level}</span><span>${P.xp} / ${need} XP</span></div><div class="xpTrack"><div class="xpFill" style="width:${pct}%"></div></div><div class="progMeta"><span>${owned}/${TOTAL} elements discovered</span><span>${P.stats.opens} crates opened</span></div><div style="margin-top:.5rem">Daily missions</div>${qs.map(q=>`<div class="quest"><span>${q[0]}</span><strong>${q[1]}/${q[2]} ${q[1]>=q[2]?'✓':''}</strong></div>`).join('')}<div style="margin-top:.45rem">Achievements</div><div class="achrow">${ach.map(a=>`<span class="ach ${a[1]?'done':''}">${a[1]?'★':'◇'} ${a[0]}</span>`).join('')}</div><div class="progMeta" style="margin-top:.45rem"><span>Daily streak: ${P.streak||0} day(s)</span><span>Mission rewards: atoms + XP</span></div></div>`}
+function missionProgress(type,isNew=false){ensureProgress();if(type==='open'){P.stats.opens++;P.quest.opens++}if(isNew){P.stats.discoveries++;P.quest.discoveries++}const checks=[P.quest.opens>=3,P.quest.discoveries>=2,P.quest.daily];P.missionClaimed=P.missionClaimed&&typeof P.missionClaimed==='object'?P.missionClaimed:{};const day=P.questDay;P.missionClaimed[day]=P.missionClaimed[day]||[];const defs=[['open',checks[0],40,25],['discover',checks[1],60,35],['daily',checks[2],25,15]];for(const [id,done,atoms,xp] of defs){if(done&&!P.missionClaimed[day].includes(id)){P.missionClaimed[day].push(id);P.atoms+=atoms;addXP(xp);toast('Mission complete: +'+atoms+' atoms and '+xp+' XP')}}}
 
 /* ---------- loading, news, chat rewards ---------- */
 function showLoading(){if($('.loadingModal'))return;const m=document.createElement('div');m.className='loadingModal';m.innerHTML=`<div class="lspin"><img src="${LOGO}" alt=""></div>`;document.body.appendChild(m)}
@@ -379,8 +384,8 @@ function home(){const av=P.avatar&&EL[P.avatar],c=av?COL[RAR[av.r]]:'#4cff4c',b=
   <button id="fr" ${b('#d9b8ff','#111','#c9a3ff')}>Friends <span class="bd" id="bd"></span></button><button id="bi" ${b('#ffd98a','#111','#ffd98a')}>Edit Bio</button>${isOwner()?`<button id="ow" ${b('#ff9a9a','#111','#f66')}>Owner Panel</button>`:''}</div>
   <div class="prof"><div class="av" style="--c:${c};${P.avatar?'background-image:'+tex(P.avatar):''}"></div><h1 style="--c:${c}">${esc(P.name)}</h1><p id="hrole">Role: ${esc(P.role)}</p><p id="hat">Atoms: ${fmt(P.atoms)}</p>
   <input class="pill" id="un" placeholder="Enter Username Here"><button class="pill" id="vs">View Stats</button><button class="pill" id="tr">Trade</button>
-  <div class="biobox"><div class="bh">Bio</div>${P.bio?esc(P.bio):'<span style="opacity:.5">No bio yet — press Edit Bio to add your Discord, YouTube and more.</span>'}</div></div></div>`);
- $('#d').onclick=()=>{const left=P.last+864e5-Date.now();if(left>0)return toast(`Come back in ${Math.ceil(left/36e5)}h`);const g=DAILYAMT;P.last=Date.now();P.atoms+=g;persist();showReward(g);setBal();home()};
+  ${progressHTML()}<div class="biobox"><div class="bh">Bio</div>${P.bio?esc(P.bio):'<span style="opacity:.5">No bio yet — press Edit Bio to add your Discord, YouTube and more.</span>'}</div></div></div>`);
+ $('#d').onclick=()=>{const left=P.last+864e5-Date.now();if(left>0)return toast(`Come back in ${Math.ceil(left/36e5)}h`);const g=DAILYAMT,now=Date.now(),prev=new Date(P.last||0),today=new Date(now),same=prev.toDateString()===today.toDateString(),yesterday=new Date(now-864e5).toDateString()===prev.toDateString();P.streak=same?(P.streak||1):yesterday?(P.streak||0)+1:1;P.last=now;P.atoms+=g;ensureProgress();P.quest.daily=true;addXP(25+Math.min(25,(P.streak-1)*2));missionProgress('daily');persist();showReward(g);setBal();home()};
  $('#nw').onclick=showNews;$('#fr').onclick=()=>go('friends');$('#bi').onclick=editBio;if(isOwner())$('#ow').onclick=ownerPanel;$('#tr').onclick=()=>go('trades');
  $('#vs').onclick=async()=>{const n=$('#un').value.trim();if(!n)return;let x;try{x=await B.byName(n.toLowerCase())}catch(e){}
   if(!x)return errBox('User not found.');
@@ -466,7 +471,7 @@ function roll(c){let r=Math.random()*wsum(c);for(const x of c.items){if((r-=x.w)
 function buy(c){modal(`<h2>Purchase the ${c.name} Crate for ${fmt(c.price)} atoms?</h2><button class="b" id="rt">Rates</button><div class="rw"><button class="b" id="y">Yes</button><button class="b" id="n">No</button></div>`,(m,close)=>{
  $('#rt',m).onclick=()=>rates(c);$('#n',m).onclick=close;
  $('#y',m).onclick=async()=>{close();if(P.atoms<c.price)return toast('Not enough atoms');
-  P.atoms-=c.price;const it=roll(c),isNew=!P.els[it.n];P.els[it.n]=(P.els[it.n]||0)+1;persist();setBal();
+  P.atoms-=c.price;const it=roll(c),isNew=!P.els[it.n];P.els[it.n]=(P.els[it.n]||0)+1;ensureProgress();addXP(10+Math.max(0,it.i)*2+(isNew?20:0));missionProgress('open',isNew);persist();setBal();
   showLoading();await sleep(1700);hideLoading();reveal(it,isNew)}})}
 function reveal(it,isNew){const col=COL[RAR[it.i]],d=document.createElement('div');d.className='reveal';
  d.innerHTML=`<div class="rn">${nm(it.n)}</div><div class="rt" style="background-image:${tex(it.n)}">${isNew?'<span class="nw">NEW!</span>':''}</div><div class="rr" style="color:${col};text-shadow:0 0 22px ${col}">${RAR[it.i]}</div>`;
@@ -509,7 +514,7 @@ function render(){let r=route in PAGES?route:'';if(P&&(r===''||r==='login'||r===
 console.log('%c%s','color: white; font-size: 100px;text-shadow: 0px 0px 20px black;','Hold Up!');
 console.log('%c%s','color: white; font-size: 25px;text-shadow: 0px 0px 5px red;',"If someone told you to copy/paste something here you have an 11/10 chance you're being scammed.");
 console.log('%c%s','color: white; font-size: 35px;text-shadow: 0px 0px 10px darkred;','Pasting anything in here could give attackers access to your Betastar account.');
-(async function boot(){showLoading();await loadCharacterImages();await initBackend();try{P=await B.restore()}catch(e){}hideLoading();render()})();
+(async function boot(){showLoading();await loadCharacterImages();await initBackend();try{P=await B.restore()}catch(e){}if(P){ensureProgress();persist()}hideLoading();render()})();
 </script>
 </body>
 </html>
